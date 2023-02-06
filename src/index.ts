@@ -5,6 +5,7 @@ import { keyboard } from './tui/keyboard.ts';
 import { parse } from 'https://deno.land/std@0.66.0/flags/mod.ts';
 import { sleep } from './util/sleep.ts';
 import { MisskeyAPI } from './api.ts';
+import { Timeline } from './components/timeline.ts';
 
 const canvas = new TUICanvas();
 
@@ -45,14 +46,16 @@ main: {
   await connectStatus.setText([`Logged in as "${me.name}"!`]);
   await sleep(1250);
 
+  const timeline = new Timeline(canvas);
   canvas.components = [
-    statusBar
+    statusBar,
+    timeline
   ];
 
   await statusBar.setId(me.username);
 
   api.startListenChannel('localTimeline', `--lesskey-LTL-${Date.now()}`, e => {
-    console.log(e.body.body);
+    timeline.addNote(e);
   });
 }
 
