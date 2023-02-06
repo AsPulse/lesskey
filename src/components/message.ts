@@ -5,22 +5,22 @@ export class Message implements TUIComponent {
 
   constructor(public parent: TUIParent){}
 
-  private text = '';
+  private text: string[] = [];
 
-  setText(newValue: string) {
+  async setText(newValue: string[]) {
     this.text = newValue;
-    this.parent.render();
+    await this.parent.render();
   }
 
   render(area: TUIArea) {
-    const str = uiString([{ text: this.text }]);
+    const str = this.text.map(v => uiString([{ text: v }]));
 
     return Promise.resolve([
       {
-        x: Math.floor((area.w - str.length) / 2),
-        y: Math.floor(area.h / 2),
+        x: Math.floor((area.w - str.map(v => v.length).reduce((a, b) => a > b ? a : b, 0)) / 2),
+        y: Math.floor((area.h - str.length) / 2),
         z: 1,
-        content: [str]
+        content: str
       },
     ]);
   }

@@ -19,7 +19,7 @@ export type TUIResult = {
 }
 
 export type TUIRenderer = (parentArea: TUIArea) => Promise<TUIResult[]>;
-export type TUIParent = { render: () => void };
+export type TUIParent = { render: () => Promise<void> };
 
 export abstract class TUIComponent {
   abstract parent: TUIParent;
