@@ -1,3 +1,6 @@
+// deno-lint-ignore no-control-regex
+const is2Byte = (str: string) => str.match(/^[^\x01-\x7E\xA1-\xDF]+$/);
+
 export function uiString(data: {
   text: string,
   foregroundColor?: [number, number, number],
@@ -12,6 +15,8 @@ export function uiString(data: {
       v.bold === true ? '\x1b[1m' : ''
     ].join('');
 
-    return v.text.split('').map(s => `${before}${s}\x1b[0m`);
+    return v.text.split('').flatMap(s => 
+      [`${before}${s}\x1b[0m`, ...(is2Byte(s) ? [''] : [])]
+    );
   });
 }
