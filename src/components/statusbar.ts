@@ -1,18 +1,9 @@
 import { TUIArea, TUIComponent, TUIParent } from '../tui/index.ts';
-import { keyboard } from '../tui/keyboard.ts';
 import { uiString } from '../tui/string.ts';
 
 export class StatusBar implements TUIComponent {
 
-  key = '';
-
-  constructor(public parent: TUIParent){
-    keyboard.onPress(buf => {
-      // deno-lint-ignore no-control-regex
-      this.key = `${buf} -> ${new TextDecoder().decode(buf).replace(/\x00+$/, '')}`;
-      this.parent.render();
-    });
-  }
+  constructor(public parent: TUIParent){}
 
   render(area: TUIArea) {
     const howToQuit = uiString([{ text: '(Ctrl+C to quit)', foregroundColor: [100, 100, 100] }]);

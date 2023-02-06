@@ -48,11 +48,6 @@ export class TUICanvas {
 
     let text = '';
 
-    if(this.size === null) {
-      //first render
-      text += '\x1b[2J'
-    }
-
     this.size = getSize();
     const { cols: width, rows: height } = this.size;
 
