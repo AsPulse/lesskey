@@ -16,16 +16,30 @@ export class Timeline implements TUIComponent {
   render(area: TUIArea) {
 
     return Promise.resolve([
-      ...[...this.notes].reverse().map((v, i) => ({
-        x: area.x,
-        y: area.y + 2 + i,
-        z: 1,
-        content: [uiString([{ text: `@${v.body.body.user.username}: ${v.body.body.text.replace(/\n/g, '[\\n]')}` }])]
-      })),
+      ...[...this.notes].reverse().flatMap((v, i) => ([
+        {
+          x: area.x,
+          y: area.y + 2 + i * 3,
+          z: 1,
+          content: [uiString([{ text: `@${v.body.body.user.username}` }])]
+        },
+        {
+          x: area.x,
+          y: area.y + 2 + i * 3 + 1,
+          z: 1,
+          content: [uiString([{ text: v.body.body.text.replace(/\n/g, '[\\n]') }])]
+        },
+        {
+          x: area.x,
+          y: area.y + 2 + i * 3 + 2,
+          z: 1,
+          content: [uiString([{ text: '' }])]
+        }
+      ])),
       {
         x: area.x,
         y: area.y,
-        z: 1,
+        z: 2,
         content: [uiString([{ text: 'LOCAL TIMELINE', bold: true }])]
       }
     ]);
