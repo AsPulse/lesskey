@@ -25,9 +25,11 @@ export class Timeline implements TUIComponent {
 
   render(area: TUIArea) {
 
-    const now = uiString([{ text: `${this.status.now} TIMELINE`, bold: true }]);
-    const left = uiString([{ text: `<[h] ${this.status.left}` }]);
-    const right = uiString([{ text: `${this.status.right} [l]>` }]);
+    const backgroundColor: [number, number, number] = [23, 124, 198];
+    const foregroundColor: [number, number, number] = [201, 232, 255];
+    const now = uiString([{ text: `${this.status.now} TIMELINE`, bold: true, backgroundColor, foregroundColor: [245, 245, 245] }]);
+    const left = uiString([{ text: ` <[h] ${this.status.left}`, backgroundColor, foregroundColor }]);
+    const right = uiString([{ text: `${this.status.right} [l]> `, backgroundColor, foregroundColor }]);
 
     return Promise.resolve([
       ...[...this.notes].reverse().flatMap((v, i) => ([
@@ -35,7 +37,7 @@ export class Timeline implements TUIComponent {
           x: area.x,
           y: area.y + 2 + i * 3,
           z: 1,
-          content: [uiString([{ text: `@${v.body.body.user.username}` }])]
+          content: [uiString([{ text: `@${v.body.body.user.username}`, foregroundColor: [100, 100, 100] }])]
         },
         {
           x: area.x,
@@ -50,6 +52,12 @@ export class Timeline implements TUIComponent {
           content: [uiString([{ text: '' }])]
         }
       ])),
+      {
+        x: area.x,
+        y: area.y,
+        z: 0,
+        content: [uiString([{ text: ' '.repeat(area.w), backgroundColor }])]
+      },
       {
         x: Math.floor(area.x + (area.w - now.length) / 2),
         y: area.y,
