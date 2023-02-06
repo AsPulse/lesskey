@@ -1,5 +1,6 @@
 import { getSize } from 'https://deno.land/x/terminal_size@0.1.0/mod.ts';
 import { writeAll } from 'https://deno.land/std@0.172.0/streams/write_all.ts';
+import { is2Byte } from './string.ts';
 export interface TUIPoint {
   x: number;
   y: number;
@@ -33,6 +34,9 @@ export class TUICanvas {
   components: TUIComponent[] = [];
   encoder = new TextEncoder();
 
+  rendering = false;
+  needToReRender = false;
+
   size: null | { cols: number, rows: number } = null;
 
   constructor() {
@@ -45,7 +49,12 @@ export class TUICanvas {
   }
 
   async render() {
+    if(this.rendering) {
+      this.needToReRender = true;
+      return;
+    }
 
+    this.rendering = true;
     let text = '';
 
     this.size = getSize();
@@ -57,7 +66,7 @@ export class TUICanvas {
 
     const results = (await Promise.all(this.components.map(v => v.render(area)))).flat();
     
-  
+ 
     for(let y = 0; y < area.h; y++) {
       for(let x = 0; x < area.w; x++) {
         const onComponents = results
@@ -67,15 +76,27 @@ export class TUICanvas {
           text += ' ';
         } else {
           const topComponent = onComponents.reduce((a, b) => a.z > b.z ? a : b);
-          text += topComponent.content[y - topComponent.y][x - topComponent.x];
+          const content = topComponent.content[y - topComponent.y][x - topComponent.x];
+          if(x === area.w - 1 && is2Byte(content)) {
+            text += ' ';
+            continue;
+          }
+          text += content;
         }
 
       }
-      if(y + 1 < area.h) text += '\n';
+      if(y + 1 < area.h) text += `\n\x1b[${y + 2};1H`;
     }
- 
-    const encoded = this.encoder.encode('\x1b[1;1H' + text + '\x1b[0K');
+    
+
+    const encoded = this.encoder.encode('\x1b[1;1H' + text + `\x1b[${area.h}:${area.w}H\x1b[0K`);
 
     await writeAll(Deno.stdout, encoded);
+
+    this.rendering = false;
+    if(this.needToReRender) {
+      this.needToReRender = false;
+      await this.render();
+    }
   }
 }
