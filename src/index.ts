@@ -46,16 +46,48 @@ main: {
   await connectStatus.setText([`Logged in as "${me.name}"!`]);
   await sleep(1250);
 
+  await statusBar.setId(me.username);
+
+  // TIMELINE
+  const timelines = [
+    { view: 'Home', id: 'homeTimeline' },
+    { view: 'Local', id: 'localTimeline' },
+    { view: 'Social', id: 'socialTimeline' },
+    { view: 'Global', id: 'globalTimeline' },
+  ] as const;
+
+  let activeTimeline = 1;
+
   const timeline = new Timeline(canvas);
   canvas.components = [
     statusBar,
     timeline
   ];
 
-  await statusBar.setId(me.username);
+  const setTimeline = (index: number) => {
+    const left = index === 0 ? null : timelines[index - 1].view;
+    const right = index === timelines.length - 1 ? null : timelines[index + 1].view;
+    timeline.resetTimeline({
+      left, right, now: timelines[index].view,
+    });
+    api.startListenChannel(timelines[index].id, `--lesskey-TL-${Date.now()}`, e => {
+      timeline.addNote(e);
+    });
+  };
 
-  api.startListenChannel('localTimeline', `--lesskey-LTL-${Date.now()}`, e => {
-    timeline.addNote(e);
+  setTimeline(activeTimeline);
+  keyboard.onPress(buf => {
+    // Key H
+    if(buf[0] === 104 && buf[1] === 0) {
+      if(activeTimeline > 0) setTimeline(--activeTimeline);
+      return;
+    }
+
+    if(buf[0] === 108 && buf[1] === 0) {
+      if(activeTimeline < timelines.length - 1) setTimeline(++activeTimeline);
+      return;
+    }
   });
+
 }
 

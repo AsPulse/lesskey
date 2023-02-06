@@ -8,7 +8,7 @@ export class Timeline implements TUIComponent {
 
   constructor(public parent: TUIParent){}
 
-  status: StatusType = { now: 'Local', left: 'Home', right: 'Social' };
+  status: StatusType = { now: 'Loading', left: null, right: null };
   notes: ChannelMessageEvent[] = [];
 
   async addNote(note: ChannelMessageEvent) {
