@@ -3,6 +3,9 @@ import { StatusBar } from './components/statusbar.ts';
 import { TUICanvas } from './tui/index.ts';
 import { keyboard } from './tui/keyboard.ts';
 import { parse } from 'https://deno.land/std@0.66.0/flags/mod.ts';
+import { sleep } from './util/sleep.ts';
+import { MisskeyAPI } from './api.ts';
+import { Timeline } from './components/timeline.ts';
 
 const canvas = new TUICanvas();
 
@@ -19,9 +22,40 @@ await canvas.render();
 
 const parsedArgs = parse(Deno.args);
 
-if('token' in parsedArgs) {
-  connectStatus.setText(['Connecting to misskey.io!', 'Please wait...']);
-} else {
-  connectStatus.setText(['API Token was not provided!', 'Usage: lesskey --token <YOUR_TOKEN_HERE>']); 
+main: {
+  if(!('token' in parsedArgs)) {
+    await connectStatus.setText(['API Token was not provided!', 'Usage: lesskey --token <YOUR_TOKEN_HERE>']); 
+    break main;
+  }
+
+  await connectStatus.setText(['Connecting to misskey.io!', 'Please wait...']);
+  await sleep(300);
+  const api = new MisskeyAPI(parsedArgs.token, () => {
+    connectStatus.setText(['Error: The token is wrong.']);
+  });
+
+  await api.ws;
+
+  const me = await api.getMe();
+
+  if(!me.success) {
+    await connectStatus.setText(['An unknown error occurred during the connection.']);
+    break main;
+  }
+
+  await connectStatus.setText([`Logged in as "${me.name}"!`]);
+  await sleep(1250);
+
+  const timeline = new Timeline(canvas);
+  canvas.components = [
+    statusBar,
+    timeline
+  ];
+
+  await statusBar.setId(me.username);
+
+  api.startListenChannel('localTimeline', `--lesskey-LTL-${Date.now()}`, e => {
+    timeline.addNote(e);
+  });
 }
 

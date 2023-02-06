@@ -1,0 +1,99 @@
+import { z } from 'https://deno.land/x/zod@v3.16.1/mod.ts';
+
+const userSchema = z.object({
+  username: z.string(),
+  name: z.string(),
+});
+
+const _errorSchema = z.object({
+  error: z.object({
+    code: z.string()
+  })
+});
+
+const channelMessageSchema = z.object({
+  type: z.literal('channel'),
+  body: z.object({
+    id: z.string(),
+    type: z.literal('note'),
+    body: z.object({
+      text: z.string(), 
+      user: userSchema,
+    }),
+  })
+});
+
+export type ChannelMessageEvent = z.infer<typeof channelMessageSchema>;
+
+export class MisskeyAPI {
+  ws: Promise<WebSocket>;
+  listens: { type: 'channel', id: string, onMessage: (info: ChannelMessageEvent) => void }[] = [];
+
+  constructor(public token: string, onError: (e: Error) => void) {
+    this.ws = new Promise(resolve => {
+      try {
+        const ws = new WebSocket(`wss://misskey.io/streaming?i=${token}`);
+        ws.onopen = () => {
+          resolve(ws);
+          ws.onmessage = (m: MessageEvent) => {
+            try {
+              const json = JSON.parse(m.data);
+
+              const channelMessage = channelMessageSchema.safeParse(json);
+              if(channelMessage.success) {
+                this.listens.find(v => v.id === channelMessage.data.body.id)?.onMessage(channelMessage.data);
+              }
+
+            } catch {
+              //TODO: WS Error Parse JSON
+            }
+          };
+        };
+        ws.onclose = () => {
+          //TODO: handle correctly;
+          Deno.exit(1);
+        };
+      } catch(e) {
+        onError(e);
+      }
+    });
+  }
+
+  private async request(endpoint: `/${string}`, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const req = await fetch(
+      `https://misskey.io/api${endpoint}`, {
+        method: 'POST',
+        body: JSON.stringify({ i: this.token, ...payload }),
+        headers: {
+          ['Content-Type']: 'application/json',
+        }
+      }
+    );
+    return req.json();
+  }
+
+  async getMe(): Promise<{ success: true } & z.infer<typeof userSchema> | { success: false }> {
+    const api = await this.request('/i', {});
+
+    const ok = userSchema.safeParse(api);
+    if(ok.success) {
+      return { success: true, ...ok.data };
+    }
+
+    return { success: false };
+  
+  }
+
+  async startListenChannel(channel: string, id: string, onMessage: (ev: ChannelMessageEvent) => void) {
+    this.listens.push({ type: 'channel', id, onMessage });
+    (await this.ws).send(JSON.stringify({
+      type: 'connect',
+      body: {
+        channel,
+        id,
+      }
+    }));
+  }
+
+
+}
