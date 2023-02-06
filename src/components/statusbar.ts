@@ -1,7 +1,17 @@
 import { TUIArea, TUIComponent, TUIParent } from '../tui/index.ts';
+import { keyboard } from '../tui/keyboard.ts';
 
 export class StatusBar implements TUIComponent {
-  constructor(public parent: TUIParent){}
+
+  key = '';
+
+  constructor(public parent: TUIParent){
+    keyboard.onPress(buf => {
+      // deno-lint-ignore no-control-regex
+      this.key = `${buf} -> ${new TextDecoder().decode(buf).replace(/\x00+$/, '')}`;
+      this.parent.render();
+    });
+  }
 
   render(area: TUIArea) {
     return Promise.resolve([
@@ -10,15 +20,9 @@ export class StatusBar implements TUIComponent {
         y: area.h - area.y - 1,
         z: 5,
         content: [
-          `Hello, width: ${area.w}, height: ${area. h}`.split('')
+          `width: ${area.w}, height: ${area.h}, keyboard: ${this.key}`.split('')
         ]
       },
-      ...[...Array(area.h - 1).keys()].map(v => ({
-        x: 0,
-        y: v,
-        z: 5,
-        content: [`${v}`.split('')]
-      }))
     ]);
   }
 }

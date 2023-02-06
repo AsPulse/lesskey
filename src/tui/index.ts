@@ -33,15 +33,35 @@ export class TUICanvas {
   components: TUIComponent[] = [];
   encoder = new TextEncoder();
 
+  size: null | { cols: number, rows: number } = null;
+
+  constructor() {
+    setInterval(() => {
+      if(this.size === null) return;
+      const newSize = getSize();
+      if(newSize.cols === this.size.cols && newSize.rows == this.size.rows) return;
+      this.render();
+    }, 100);
+  }
+
   async render() {
-    const { cols: width, rows: height } = getSize();
+
+    let text = '';
+
+    if(this.size === null) {
+      //first render
+      text += '\x1b[2J'
+    }
+
+    this.size = getSize();
+    const { cols: width, rows: height } = this.size;
+
     const area: TUIArea = {
       x: 0, y: 0, w: width, h: height, z: -1,
     };
 
     const results = (await Promise.all(this.components.map(v => v.render(area)))).flat();
     
-    let text = '';
   
     for(let y = 0; y < area.h; y++) {
       for(let x = 0; x < area.w; x++) {
@@ -59,11 +79,7 @@ export class TUICanvas {
       if(y + 1 < area.h) text += '\n';
     }
  
-    const encoded = this.encoder.encode('\x1b[2J\x1b[1;1H' + text);
-
-    console.log(area);
-    console.log(text.length);
-    console.log(encoded.length);
+    const encoded = this.encoder.encode('\x1b[1;1H' + text + '\x1b[0K');
 
     await writeAll(Deno.stdout, encoded);
   }
