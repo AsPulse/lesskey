@@ -79,7 +79,7 @@ export class TUICanvas {
         }
 
       }
-      if(y + 1 < area.h) text += '\n';
+      if(y + 1 < area.h) text += `\n\x1b[${y + 2};1H`;
     }
  
     const encoded = this.encoder.encode('\x1b[1;1H' + text + '\x1b[0K');
