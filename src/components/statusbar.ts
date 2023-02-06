@@ -7,9 +7,9 @@ export class StatusBar implements TUIComponent {
 
   id: null | string = null;
 
-  setId(id: string) {
+  async setId(id: string) {
     this.id = id;
-    this.parent.render();
+    await this.parent.render();
   }
 
   render(area: TUIArea) {

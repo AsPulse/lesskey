@@ -29,15 +29,15 @@ main: {
 
   await connectStatus.setText(['Connecting to misskey.io!', 'Please wait...']);
   await sleep(300);
-  const api = new MisskeyAPI(parsedArgs.token);
+  const api = new MisskeyAPI(parsedArgs.token, () => {
+    connectStatus.setText(['Error: The token is wrong.']);
+  });
+
+  await api.ws;
+
   const me = await api.getMe();
 
   if(!me.success) {
-    if(me.reason === 'AUTHENTICATION_FAILED') {
-      await connectStatus.setText(['Error: The token is wrong.']);
-      break main;
-    }
-
     await connectStatus.setText(['An unknown error occurred during the connection.']);
     break main;
   }
@@ -48,6 +48,11 @@ main: {
   canvas.components = [
     statusBar
   ];
+
   await statusBar.setId(me.username);
+
+  api.startListenChannel('localTimeline', `--lesskey-LTL-${Date.now()}`, e => {
+    console.log(e.body.body);
+  });
 }
 
