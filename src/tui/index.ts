@@ -33,6 +33,9 @@ export class TUICanvas {
   components: TUIComponent[] = [];
   encoder = new TextEncoder();
 
+  rendering = false;
+  needToReRender = false;
+
   size: null | { cols: number, rows: number } = null;
 
   constructor() {
@@ -45,7 +48,12 @@ export class TUICanvas {
   }
 
   async render() {
+    if(this.rendering) {
+      this.needToReRender = true;
+      return;
+    }
 
+    this.rendering = true;
     let text = '';
 
     this.size = getSize();
@@ -77,5 +85,11 @@ export class TUICanvas {
     const encoded = this.encoder.encode('\x1b[1;1H' + text + '\x1b[0K');
 
     await writeAll(Deno.stdout, encoded);
+
+    this.rendering = false;
+    if(this.needToReRender) {
+      this.needToReRender = false;
+      await this.render();
+    }
   }
 }

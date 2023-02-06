@@ -52,11 +52,12 @@ main: {
   const timelines = [
     { view: 'Home', id: 'homeTimeline' },
     { view: 'Local', id: 'localTimeline' },
-    { view: 'Social', id: 'socialTimeline' },
+    { view: 'Social', id: 'hybridTimeline' },
     { view: 'Global', id: 'globalTimeline' },
   ] as const;
 
   let activeTimeline = 1;
+  let id: null | string = null;
 
   const timeline = new Timeline(canvas);
   canvas.components = [
@@ -64,13 +65,19 @@ main: {
     timeline
   ];
 
-  const setTimeline = (index: number) => {
+  const setTimeline = async (index: number) => {
+    if(id !== null) {
+      await api.stopListenChannel(id);
+    }
+    console.log(index);
     const left = index === 0 ? null : timelines[index - 1].view;
     const right = index === timelines.length - 1 ? null : timelines[index + 1].view;
     timeline.resetTimeline({
       left, right, now: timelines[index].view,
     });
-    api.startListenChannel(timelines[index].id, `--lesskey-TL-${Date.now()}`, e => {
+
+    id = `--lesskey-TL-${Date.now()}`;
+    api.startListenChannel(timelines[index].id, id, e => {
       timeline.addNote(e);
     });
   };

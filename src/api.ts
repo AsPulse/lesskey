@@ -95,5 +95,13 @@ export class MisskeyAPI {
     }));
   }
 
+  async stopListenChannel(id: string) {
+    (await this.ws).send(JSON.stringify({
+      type: 'disconnect',
+      body: {
+        id,
+      }
+    }));
+  }
 
 }

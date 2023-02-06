@@ -51,23 +51,23 @@ export class Timeline implements TUIComponent {
         }
       ])),
       {
-        x: area.x + (area.w - now.length) / 2,
+        x: Math.floor(area.x + (area.w - now.length) / 2),
         y: area.y,
         z: 3,
         content: [now]
       },
-      {
+      ...this.status.left === null ? [] : [{
         x: area.x,
         y: area.y,
         z: 2,
-        content: this.status.left !== null ? [left] : []
-      },
-      {
-        x: area.w - area.x - right.length - 1,
+        content: [left]
+      }],
+      ...this.status.right === null ? [] : [{
+        x: area.w - area.x - right.length,
         y: area.y,
         z: 2,
-        content: this.status.right !== null ? [right] : []
-      }
+        content: [right],
+      }]
     ]);
   }
 }
