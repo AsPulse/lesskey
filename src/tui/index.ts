@@ -1,4 +1,3 @@
-import { getSize } from 'https://deno.land/x/terminal_size@0.1.0/mod.ts';
 import { writeAll } from 'https://deno.land/std@0.172.0/streams/write_all.ts';
 import { is2Byte } from './string.ts';
 export interface TUIPoint {
@@ -37,13 +36,13 @@ export class TUICanvas {
   rendering = false;
   needToReRender = false;
 
-  size: null | { cols: number, rows: number } = null;
+  size: null | { columns: number, rows: number } = null;
 
   constructor() {
     setInterval(() => {
       if(this.size === null) return;
-      const newSize = getSize();
-      if(newSize.cols === this.size.cols && newSize.rows == this.size.rows) return;
+      const newSize = Deno.consoleSize();
+      if(newSize.columns === this.size.columns && newSize.rows == this.size.rows) return;
       this.render();
     }, 100);
   }
@@ -57,8 +56,8 @@ export class TUICanvas {
     this.rendering = true;
     let text = '';
 
-    this.size = getSize();
-    const { cols: width, rows: height } = this.size;
+    this.size = Deno.consoleSize();
+    const { columns: width, rows: height } = this.size;
 
     const area: TUIArea = {
       x: 0, y: 0, w: width, h: height, z: -1,
