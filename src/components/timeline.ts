@@ -45,7 +45,7 @@ export class Timeline implements TUIComponent {
 
   activeTimeline: TimelineId = 1;
 
-  async setActiveTimeline(index: TimelineId) {
+  private async setActiveTimeline(index: TimelineId) {
     this.activeTimeline = index;
     if(this.id !== null) {
       await this.api.stopListenChannel(this.id);
@@ -58,11 +58,20 @@ export class Timeline implements TUIComponent {
     this.id = `--lesskey-TL-${Date.now()}`;
 
     await this.parent.render();
-    this.api.startListenChannel(timelines[index].id, this.id, e => {
-      this.notes.push(e);
-      this.parent.render();
-    });
+    this.api.startListenChannel(timelines[index].id, this.id, e => this.addNote(e));
 
+  }
+
+  private async addNote(e: ChannelMessageEvent) {
+    this.notes.unshift(e);
+    // Keep a cache of the 100 most recent notes and the 10 surrounding notes that are in focus.
+    this.notes = this.notes.filter((_, i) => {
+      if(i < 100) return true;
+      if(this.selectedNotes === -1) return false;
+      if(Math.abs(i - this.selectedNotes) < 10) return true;
+      return false;
+    });
+    await this.parent.render();
   }
 
   render(area: TUIArea) {
@@ -74,7 +83,7 @@ export class Timeline implements TUIComponent {
     const right = uiString([{ text: `${this.status.right} [l]> `, backgroundColor, foregroundColor }], area.w, true);
 
     return Promise.resolve([
-      ...[...this.notes].reverse().flatMap((v, i) => ([
+      ...this.notes.flatMap((v, i) => ([
         {
           x: area.x,
           y: area.y + 2 + i * 3,
