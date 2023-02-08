@@ -84,7 +84,7 @@ export class TUICanvas {
         }
 
       }
-      if(y + 1 < area.h) text += `\n\x1b[${y + 2};1H`;
+      if(y + 1 < area.h) text += '\n'; //`\n\x1b[${y + 2};1H`;
     }
     
 

@@ -13,7 +13,7 @@ export class Message implements TUIComponent {
   }
 
   render(area: TUIArea) {
-    const str = this.text.map(v => uiString([{ text: v }]));
+    const str = this.text.flatMap(v => uiString([{ text: v }], area.w, false));
 
     return Promise.resolve([
       {
