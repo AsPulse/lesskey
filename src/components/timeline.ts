@@ -13,7 +13,10 @@ const timelines = [
 ] as const;
 
 export type TimelineId = number & (keyof typeof timelines);
-
+export type MisskeyNote = {
+  message: ChannelMessageEvent,
+  selected: boolean,
+}
 
 
 export class Timeline implements TUIComponent {
@@ -22,9 +25,11 @@ export class Timeline implements TUIComponent {
 
 
   status: StatusType = { now: 'Loading', left: null, right: null };
-  notes: ChannelMessageEvent[] = [];
+  notes: MisskeyNote[] = [];
 
-  selectedNotes = -1;
+  get selectedNotes() {
+    return this.notes.findIndex(n => n.selected);
+  }
 
   constructor(public parent: TUIParent, public api: MisskeyAPI){
     this.setActiveTimeline(1);
@@ -63,12 +68,14 @@ export class Timeline implements TUIComponent {
   }
 
   private async addNote(e: ChannelMessageEvent) {
-    this.notes.unshift(e);
+    this.notes.unshift({ message: e, selected: false });
+    const selected = this.selectedNotes;
+
     // Keep a cache of the 100 most recent notes and the 10 surrounding notes that are in focus.
     this.notes = this.notes.filter((_, i) => {
       if(i < 100) return true;
-      if(this.selectedNotes === -1) return false;
-      if(Math.abs(i - this.selectedNotes) < 10) return true;
+      if(selected === -1) return false;
+      if(Math.abs(i - selected) < 10) return true;
       return false;
     });
     await this.parent.render();
@@ -88,13 +95,15 @@ export class Timeline implements TUIComponent {
     const height = area.h - area.y;
 
     for (const note of this.notes) {
-    
+   
+      const body = note.message.body.body;
+
       texts.push(uiString([
-        { text: `@${note.body.body.user.name}`, foregroundColor: [100, 100, 100] },
+        { text: `@${body.user.name}`, foregroundColor: [100, 100, 100] },
       ], width, true));
 
       texts.push(
-        ...note.body.body.text.split(/\n/g).flatMap(text => 
+        ...body.text.split(/\n/g).flatMap(text => 
           uiString([{ text },], width, false)
         )
       );
