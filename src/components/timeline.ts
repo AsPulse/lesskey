@@ -11,7 +11,7 @@ const timelines = [
   { view: "Home", id: "homeTimeline", apiId: "timeline" },
   { view: "Local", id: "localTimeline", apiId: "local-timeline" },
   { view: "Social", id: "hybridTimeline", apiId: "hybrid-timeline" },
-  { view: "Global", id: "globalTimeline", apiid: "global-timeline" },
+  { view: "Global", id: "globalTimeline", apiId: "global-timeline" },
 ] as const;
 
 export type TimelineId = number & (keyof typeof timelines);
@@ -22,7 +22,7 @@ export type MisskeyNote = {
 };
 
 const Note = (note: MisskeyNote, width: number) => {
-  const content = note.message.text.split(/\n/).flatMap((text) =>
+  const content = (note.message.text ?? '').split(/\n/).flatMap((text) =>
     uiString([{ text }], width, false)
   );
 
@@ -103,10 +103,15 @@ export class Timeline implements TUIComponent {
       : timelines[index + 1].view;
 
     this.status = { left, right, now: timelines[index].view };
-    this.notes = [];
+    this.notes = 
+      (await this.api.fetchTimeline(timelines[index].apiId, 10))
+        .toReversed()
+        .map(v => ({ message: v, selected: false, opacity: 1 }));
     this.id = `--lesskey-TL-${Date.now()}`;
 
     await this.parent.render();
+
+
     this.api.startListenChannel(
       timelines[index].id,
       this.id,

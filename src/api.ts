@@ -12,9 +12,11 @@ const _errorSchema = z.object({
 });
 
 const messageSchema = z.object({
-  text: z.string(),
+  text: z.string().nullable(),
   user: userSchema,
 });
+
+const fetchTimelineSchema = messageSchema.array();
 
 const channelMessageSchema = z.object({
   type: z.literal("channel"),
@@ -96,6 +98,13 @@ export class MisskeyAPI {
 
     return { success: false };
   }
+
+  async fetchTimeline(type: string, limit: number): Promise<z.infer<typeof fetchTimelineSchema>> {
+    const api = await this.request(`/notes/${type}`, { limit });
+    const data = fetchTimelineSchema.parse(api);
+    return data;
+  }
+
 
   async startListenChannel(
     channel: string,
