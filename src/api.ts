@@ -2,7 +2,7 @@ import { z } from "https://deno.land/x/zod@v3.16.1/mod.ts";
 
 const userSchema = z.object({
   username: z.string(),
-  name: z.string(),
+  name: z.string().nullable(),
 });
 
 const _errorSchema = z.object({
