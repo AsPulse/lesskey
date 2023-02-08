@@ -1,5 +1,5 @@
 import { ChannelMessageEvent, MisskeyAPI } from '../api.ts';
-import { TUIArea, TUIComponent, TUIParent } from '../tui/index.ts';
+import { TUIArea, TUIComponent, TUIParent, TUIResult } from '../tui/index.ts';
 import { keyboard } from '../tui/keyboard.ts';
 import { uiString } from '../tui/string.ts';
 
@@ -18,6 +18,27 @@ export type MisskeyNote = {
   selected: boolean,
 }
 
+const Note = (note: MisskeyNote, width: number) => {
+    const body = note.message.body.body;
+    const content = body.text.split(/\n/).flatMap(text => uiString([{ text }], width, false));
+
+    return {
+      components: [
+        {
+          x: 0,
+          y: 0,
+          content: [
+            uiString([{ text: `@${body.user.username}`, foregroundColor: [130, 130, 130] }], width, true)
+          ] 
+        }, {
+          x: 0,
+          y: 1,
+          content,
+        }
+      ],
+      height: content.length + 1
+    };
+}
 
 export class Timeline implements TUIComponent {
 
@@ -89,39 +110,77 @@ export class Timeline implements TUIComponent {
     const left = uiString([{ text: ` <[h] ${this.status.left}`, backgroundColor, foregroundColor }], area.w, true);
     const right = uiString([{ text: `${this.status.right} [l]> `, backgroundColor, foregroundColor }], area.w, true);
 
-    const texts = [];
     
     const width = area.w - area.x;
     const height = area.h - area.y - 2;
 
+    const components: TUIResult[] = [];
+    let stuck = 1;
+    let index = 0;
+
     for (const note of this.notes) {
-   
-      const body = note.message.body.body;
 
-      texts.push(uiString([
-        { text: `@${body.user.name}`, foregroundColor: [100, 100, 100] },
-      ], width, true));
+      if(index === 0) {
+        components.push({
+          x: area.x,
+          y: area.y + stuck,
+          z: 1,
+          content: [uiString([{ text: `┌${'─'.repeat(width - 2)}┐`, foregroundColor: [80, 80, 80] }], width, true)]
+        });
+      } else {
+        components.push({
+          x: area.x,
+          y: area.y + stuck,
+          z: 1,
+          content: [uiString([{ text: `├${'─'.repeat(width - 2)}┤`, foregroundColor: [80, 80, 80] }], width, true)]
+        });
+      }
 
-      texts.push(
-        ...body.text.split(/\n/g).flatMap(text => 
-          uiString([{ text },], width, false)
+      stuck++;
+      const renderedNote = Note(note, width - 4);
+      components.push(
+        ...renderedNote.components.map(c => ({
+            x: area.x + 3 + c.x,
+            y: area.y + stuck + c.y + 1,
+            z: 1,
+            content: c.content,
+          })
         )
       );
+      components.push({
+        x: area.x,
+        y: area.y + stuck,
+        z: 1,
+        content: [...Array(renderedNote.height + 2).fill(uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true))]
+      });
 
-      texts.push([]);
+      components.push({
+        x: area.x + area.w - 1,
+        y: area.y + stuck,
+        z: 1,
+        content: [...Array(renderedNote.height + 2).fill(uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true))]
+      });
 
-      if(texts.length > height) break;
+      stuck += renderedNote.height;
+      stuck += 2;
+
+      if(index === this.notes.length - 1) {
+        components.push({
+          x: area.x,
+          y: area.y + stuck,
+          z: 1,
+          content: [uiString([{ text: `└${'─'.repeat(width - 2)}┘`, foregroundColor: [80, 80, 80] }], width, true)]
+        });
+      }
+
+      if(stuck > height) break;
+      index++;
     }
 
-    texts.splice(height);
+    stuck++;
 
     return Promise.resolve([
-      {
-        x: area.x,
-        y: area.y + 1,
-        z: 1,
-        content: texts,
-      },
+      ...components,
       {
         x: area.x,
         y: area.y,

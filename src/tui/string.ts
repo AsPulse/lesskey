@@ -1,5 +1,7 @@
-// deno-lint-ignore no-control-regex
-export const is2Byte = (str: string) => str.match(/^[^\x01-\x7E\xA1-\xDF]+$/);
+export const is2Byte = (str: string) => 
+  '┌┐├┤╭╮╰╯└┘│─…'.includes(str) ? false :
+    // deno-lint-ignore no-control-regex
+    str.match(/^[^\x01-\x7E\xA1-\xDF]+$/) !== null;
 
 export function uiString<T extends boolean>(data: {
   text: string,
