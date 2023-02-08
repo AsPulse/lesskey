@@ -2,6 +2,8 @@ import { ChannelMessageEvent, MisskeyAPI } from '../api.ts';
 import { TUIArea, TUIComponent, TUIParent, TUIResult } from '../tui/index.ts';
 import { keyboard } from '../tui/keyboard.ts';
 import { uiString } from '../tui/string.ts';
+import { Animation, easeOutExpo } from '../util/anim.ts';
+import { sleep } from '../util/sleep.ts';
 
 type StatusType = { now: string, left: string | null, right: string | null, };
 
@@ -16,6 +18,7 @@ export type TimelineId = number & (keyof typeof timelines);
 export type MisskeyNote = {
   message: ChannelMessageEvent,
   selected: boolean,
+  opacity: number,
 }
 
 const Note = (note: MisskeyNote, width: number) => {
@@ -43,8 +46,15 @@ const Note = (note: MisskeyNote, width: number) => {
 export class Timeline implements TUIComponent {
 
   id: null | string = null;
+  scrollOffset = 0;
+  scrollAnimation = new Animation(async y => {
+    await sleep(10);
+    if(Math.round(y) === this.scrollOffset) return;
+    this.scrollOffset = Math.round(y);
+    await this.parent.render();
+  });
 
-
+  lastWidth: null | number = null;
   status: StatusType = { now: 'Loading', left: null, right: null };
   notes: MisskeyNote[] = [];
 
@@ -89,7 +99,8 @@ export class Timeline implements TUIComponent {
   }
 
   private async addNote(e: ChannelMessageEvent) {
-    this.notes.unshift({ message: e, selected: false });
+    const note = { message: e, selected: false, opacity: 0 };
+    this.notes.unshift(note);
     const selected = this.selectedNotes;
 
     // Keep a cache of the 100 most recent notes and the 10 surrounding notes that are in focus.
@@ -99,6 +110,15 @@ export class Timeline implements TUIComponent {
       if(Math.abs(i - selected) < 10) return true;
       return false;
     });
+
+    if(this.lastWidth !== null) {
+      const height = Note(note, this.lastWidth - 6).height + 3;
+      this.scrollOffset += height;
+      this.scrollAnimation.moveTo([this.scrollOffset, 0], 500, easeOutExpo);
+    } else {
+      this.scrollOffset = 0;
+    }
+
     await this.parent.render();
   }
 
@@ -112,7 +132,8 @@ export class Timeline implements TUIComponent {
 
     
     const width = area.w - area.x;
-    const height = area.h - area.y - 2;
+    const height = area.h - area.y - 2 + this.scrollOffset;
+    this.lastWidth = width;
 
     const components: TUIResult[] = [];
     let stuck = 1;
@@ -147,19 +168,22 @@ export class Timeline implements TUIComponent {
           })
         )
       );
-      components.push({
-        x: area.x,
-        y: area.y + stuck,
-        z: 1,
-        content: [...Array(renderedNote.height + 2).fill(uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true))]
-      });
 
-      components.push({
-        x: area.x + area.w - 1,
-        y: area.y + stuck,
-        z: 1,
-        content: [...Array(renderedNote.height + 2).fill(uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true))]
-      });
+      for(let i = 0; i < renderedNote.height + 2; i++) {
+        components.push({
+          x: area.x,
+          y: area.y + stuck + i,
+          z: 1,
+          content: [uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true)]
+        });
+
+        components.push({
+          x: area.x + area.w - 1,
+          y: area.y + stuck + i,
+          z: 1,
+          content: [uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true)]
+        });
+      }
 
       stuck += renderedNote.height;
       stuck += 2;
@@ -180,29 +204,29 @@ export class Timeline implements TUIComponent {
     stuck++;
 
     return Promise.resolve([
-      ...components,
+      ...components.map(v => ({ ...v, y: v.y - this.scrollOffset })).filter(v => v.y >= area.y),
       {
         x: area.x,
         y: area.y,
-        z: 0,
+        z: 2,
         content: [uiString([{ text: ' '.repeat(area.w), backgroundColor }], area.w, true)]
       },
       {
         x: Math.floor(area.x + (area.w - now.length) / 2),
         y: area.y,
-        z: 3,
+        z: 4,
         content: [now]
       },
       ...this.status.left === null ? [] : [{
         x: area.x,
         y: area.y,
-        z: 2,
+        z: 3,
         content: [left]
       }],
       ...this.status.right === null ? [] : [{
         x: area.w - area.x - right.length,
         y: area.y,
-        z: 2,
+        z: 3,
         content: [right],
       }]
     ]);

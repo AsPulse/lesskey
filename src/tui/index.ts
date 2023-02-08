@@ -69,7 +69,12 @@ export class TUICanvas {
     for(let y = 0; y < area.h; y++) {
       for(let x = 0; x < area.w; x++) {
         const onComponents = results
-            .filter(({ x: cx, y: cy, content }) => cy <= y && y < cy + content.length && cx <= x && x < cx + content[y - cy].length);
+            .filter(({ x: cx, y: cy, content }) => {
+              if(cy <= y && y < cy + content.length && cx <= x && content[y - cy] === undefined) {
+                throw { content, y, x, cx, cy };
+              }
+              return cy <= y && y < cy + content.length && cx <= x && x < cx + content[y - cy].length;
+            });
 
         if(onComponents.length < 1) {
           text += ' ';

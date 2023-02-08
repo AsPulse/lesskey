@@ -18,10 +18,38 @@ export const animation = async (
   action: (y: number) => Promise<void>,
   easingFunction: EasingFunction,
 ) => {
-  const startTime = Date.now();
   await action(change[0]);
+  const startTime = Date.now();
   while(Date.now() - startTime <= ms) {
-    await action(interpolation(Date.now(), [startTime, Date.now()], change, easingFunction));
+    await action(interpolation(Date.now(), [startTime, startTime + ms], change, easingFunction));
   }
   await action(change[1]);
 };
+
+export class Animation {
+
+  change: [[number, number], [number, number]] | null = null;
+
+  constructor(public action: (y: number) => Promise<void>){}
+
+
+  async moveTo(change:[number, number], ms: number, easingFunction: EasingFunction) {
+
+    if(this.change !== null) {
+      this.change = [[interpolation(Date.now(), this.change[1], this.change[0], easingFunction), change[1]], [Date.now(), Date.now() + ms]];
+      return;
+    }
+    this.change = [change, [Date.now(), Date.now() + ms]];
+
+    this.action(this.change[0][0]);
+
+    while(Date.now() <= this.change[1][1]) {
+      await this.action(interpolation(Date.now(), this.change[1], this.change[0], easingFunction));
+    }
+
+    this.action(this.change[0][1]);
+
+    this.change = null;
+
+  }
+}
