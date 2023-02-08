@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "std/testing/asserts.ts";
 import { is2Byte } from "./string.ts";
 
 Deno.test("is2Byte() given numbers", () => {

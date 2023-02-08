@@ -2,7 +2,7 @@ import { Message } from "./components/message.ts";
 import { StatusBar } from "./components/statusbar.ts";
 import { TUICanvas } from "./tui/index.ts";
 import { keyboard } from "./tui/keyboard.ts";
-import { parse } from "https://deno.land/std@0.66.0/flags/mod.ts";
+import { parse } from "std/flags/mod.ts";
 import { sleep } from "./util/sleep.ts";
 import { MisskeyAPI } from "./api.ts";
 import { Timeline } from "./components/timeline.ts";

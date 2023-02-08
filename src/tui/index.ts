@@ -1,4 +1,4 @@
-import { writeAll } from "https://deno.land/std@0.172.0/streams/write_all.ts";
+import { writeAll } from "std/streams/write_all.ts";
 import { is2Byte } from "./string.ts";
 export interface TUIPoint {
   x: number;
