@@ -137,7 +137,7 @@ export class Timeline implements TUIComponent {
       }
 
       stuck++;
-      const renderedNote = Note(note, width - 4);
+      const renderedNote = Note(note, width - 6);
       components.push(
         ...renderedNote.components.map(c => ({
             x: area.x + 3 + c.x,
