@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500">
+  <defs>
+    <linearGradient id="a">
+      <stop offset="0" stop-color="#fc6873"/>
+      <stop offset="1" stop-color="#fd8993"/>
+    </linearGradient>
+    <linearGradient xlink:href="#a" id="b" x1="430" x2="250" y1="140" y2="300" gradientTransform="translate(125 80) scale(.5)" gradientUnits="userSpaceOnUse"/>
+    <filter id="d" width="1.1" height="1.1" x="0" y="-.1" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#000" flood-opacity=".7" result="flood"/>
+      <feComposite in="SourceGraphic" in2="flood" operator="in" result="composite1"/>
+      <feGaussianBlur in="composite1" result="blur" stdDeviation="5"/>
+      <feOffset result="offset"/>
+      <feComposite in="SourceGraphic" in2="offset" result="composite2"/>
+    </filter>
+    <filter id="c" width="1.2" height="1.2" x="-.1" y="-.1" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#000" flood-opacity=".7" result="flood"/>
+      <feComposite in="SourceGraphic" in2="flood" operator="in" result="composite1"/>
+      <feGaussianBlur in="composite1" result="blur" stdDeviation="5"/>
+      <feOffset result="offset"/>
+      <feComposite in="SourceGraphic" in2="offset" result="composite2"/>
+    </filter>
+  </defs>
+  <g paint-order="markers stroke fill">
+    <path fill="#ffcce2" d="M1 0h500v500H1z"/>
+    <ellipse cx="290" cy="200" fill="url(#b)" filter="url(#c)" rx="65" ry="65"/>
+    <g fill="#db7ffa" filter="url(#d)">
+      <rect width="120" height="38" x="245" y="395" ry="20"/>
+      <rect width="140" height="45" x="-180" y="300" ry="25" transform="rotate(-45)"/>
+      <rect width="140" height="45" x="300" y="140" ry="25" transform="rotate(45)"/>
+    </g>
+    <path fill="#fc7680" d="M1 0h500v52H1z"/>
+    <path fill="#ff5f6b" d="M245 0h256v52H245z"/>
+    <path fill="#ea414d" d="M387 0h114v52H387z"/>
+  </g>
+</svg>
