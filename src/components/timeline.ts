@@ -1,4 +1,4 @@
-import { ChannelMessageEvent, MisskeyAPI } from "../api.ts";
+import { MisskeyAPI, NewNoteEvent } from "../api.ts";
 import { TUIArea, TUIComponent, TUIParent, TUIResult } from "../tui/index.ts";
 import { keyboard } from "../tui/keyboard.ts";
 import { uiString } from "../tui/string.ts";
@@ -8,22 +8,21 @@ import { sleep } from "../util/sleep.ts";
 type StatusType = { now: string; left: string | null; right: string | null };
 
 const timelines = [
-  { view: "Home", id: "homeTimeline" },
-  { view: "Local", id: "localTimeline" },
-  { view: "Social", id: "hybridTimeline" },
-  { view: "Global", id: "globalTimeline" },
+  { view: "Home", id: "homeTimeline", apiId: "timeline" },
+  { view: "Local", id: "localTimeline", apiId: "local-timeline" },
+  { view: "Social", id: "hybridTimeline", apiId: "hybrid-timeline" },
+  { view: "Global", id: "globalTimeline", apiId: "global-timeline" },
 ] as const;
 
 export type TimelineId = number & (keyof typeof timelines);
 export type MisskeyNote = {
-  message: ChannelMessageEvent;
+  message: NewNoteEvent;
   selected: boolean;
   opacity: number;
 };
 
 const Note = (note: MisskeyNote, width: number) => {
-  const body = note.message.body.body;
-  const content = body.text.split(/\n/).flatMap((text) =>
+  const content = (note.message.text ?? "").split(/\n/).flatMap((text) =>
     uiString([{ text }], width, false)
   );
 
@@ -35,7 +34,7 @@ const Note = (note: MisskeyNote, width: number) => {
         content: [
           uiString(
             [{
-              text: `@${body.user.username}`,
+              text: `@${note.message.user.username}`,
               foregroundColor: [130, 130, 130],
             }],
             width,
@@ -104,18 +103,20 @@ export class Timeline implements TUIComponent {
       : timelines[index + 1].view;
 
     this.status = { left, right, now: timelines[index].view };
-    this.notes = [];
+    this.notes = (await this.api.fetchTimeline(timelines[index].apiId, 10))
+      .map((v) => ({ message: v, selected: false, opacity: 1 }));
     this.id = `--lesskey-TL-${Date.now()}`;
 
     await this.parent.render();
+
     this.api.startListenChannel(
       timelines[index].id,
       this.id,
-      (e) => this.addNote(e),
+      (e) => this.addNote(e.body.body),
     );
   }
 
-  private async addNote(e: ChannelMessageEvent) {
+  private async addNote(e: NewNoteEvent) {
     const note = { message: e, selected: false, opacity: 0 };
     this.notes.unshift(note);
     const selected = this.selectedNotes;

@@ -11,19 +11,24 @@ const _errorSchema = z.object({
   }),
 });
 
+const messageSchema = z.object({
+  text: z.string().nullable(),
+  user: userSchema,
+});
+
+const fetchTimelineSchema = messageSchema.array();
+
 const channelMessageSchema = z.object({
   type: z.literal("channel"),
   body: z.object({
     id: z.string(),
     type: z.literal("note"),
-    body: z.object({
-      text: z.string(),
-      user: userSchema,
-    }),
+    body: messageSchema,
   }),
 });
 
 export type ChannelMessageEvent = z.infer<typeof channelMessageSchema>;
+export type NewNoteEvent = z.infer<typeof messageSchema>;
 
 export class MisskeyAPI {
   ws: Promise<WebSocket>;
@@ -91,6 +96,15 @@ export class MisskeyAPI {
     }
 
     return { success: false };
+  }
+
+  async fetchTimeline(
+    type: string,
+    limit: number,
+  ): Promise<z.infer<typeof fetchTimelineSchema>> {
+    const api = await this.request(`/notes/${type}`, { limit });
+    const data = fetchTimelineSchema.parse(api);
+    return data;
   }
 
   async startListenChannel(
