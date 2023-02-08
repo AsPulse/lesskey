@@ -1,27 +1,69 @@
-import { ChannelMessageEvent } from '../api.ts';
+import { ChannelMessageEvent, MisskeyAPI } from '../api.ts';
 import { TUIArea, TUIComponent, TUIParent } from '../tui/index.ts';
+import { keyboard } from '../tui/keyboard.ts';
 import { uiString } from '../tui/string.ts';
 
 type StatusType = { now: string, left: string | null, right: string | null, };
 
+const timelines = [
+  { view: 'Home', id: 'homeTimeline' },
+  { view: 'Local', id: 'localTimeline' },
+  { view: 'Social', id: 'hybridTimeline' },
+  { view: 'Global', id: 'globalTimeline' },
+] as const;
+
+export type TimelineId = number & (keyof typeof timelines);
+
+
+
 export class Timeline implements TUIComponent {
 
-  constructor(public parent: TUIParent){}
+  id: null | string = null;
+
 
   status: StatusType = { now: 'Loading', left: null, right: null };
   notes: ChannelMessageEvent[] = [];
 
-  async addNote(note: ChannelMessageEvent) {
-    this.notes.push(note);
-    await this.parent.render();
+  selectedNotes = -1;
+
+  constructor(public parent: TUIParent, public api: MisskeyAPI){
+    this.setActiveTimeline(1);
+    keyboard.onPress(buf => {
+      // Key H
+      if(buf[0] === 104 && buf[1] === 0) {
+        if(this.activeTimeline > 0) this.setActiveTimeline(this.activeTimeline - 1);
+        return;
+      }
+
+      if(buf[0] === 108 && buf[1] === 0) {
+        if(this.activeTimeline < timelines.length - 1) this.setActiveTimeline(this.activeTimeline + 1);
+        return;
+      }
+    });
   }
 
-  async resetTimeline(newStatus: StatusType) {
+
+  activeTimeline: TimelineId = 1;
+
+  async setActiveTimeline(index: TimelineId) {
+    this.activeTimeline = index;
+    if(this.id !== null) {
+      await this.api.stopListenChannel(this.id);
+    }
+    const left = index === 0 ? null : timelines[index - 1].view;
+    const right = index === timelines.length - 1 ? null : timelines[index + 1].view;
+
+    this.status = { left, right, now: timelines[index].view };
     this.notes = [];
-    this.status = newStatus;
-    await this.parent.render();
-  }
+    this.id = `--lesskey-TL-${Date.now()}`;
 
+    await this.parent.render();
+    this.api.startListenChannel(timelines[index].id, this.id, e => {
+      this.notes.push(e);
+      this.parent.render();
+    });
+
+  }
 
   render(area: TUIArea) {
 
@@ -79,3 +121,4 @@ export class Timeline implements TUIComponent {
     ]);
   }
 }
+
