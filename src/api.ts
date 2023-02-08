@@ -1,4 +1,4 @@
-import { z } from 'https://deno.land/x/zod@v3.16.1/mod.ts';
+import { z } from "https://deno.land/x/zod@v3.16.1/mod.ts";
 
 const userSchema = z.object({
   username: z.string(),
@@ -7,30 +7,34 @@ const userSchema = z.object({
 
 const _errorSchema = z.object({
   error: z.object({
-    code: z.string()
-  })
+    code: z.string(),
+  }),
 });
 
 const channelMessageSchema = z.object({
-  type: z.literal('channel'),
+  type: z.literal("channel"),
   body: z.object({
     id: z.string(),
-    type: z.literal('note'),
+    type: z.literal("note"),
     body: z.object({
-      text: z.string(), 
+      text: z.string(),
       user: userSchema,
     }),
-  })
+  }),
 });
 
 export type ChannelMessageEvent = z.infer<typeof channelMessageSchema>;
 
 export class MisskeyAPI {
   ws: Promise<WebSocket>;
-  listens: { type: 'channel', id: string, onMessage: (info: ChannelMessageEvent) => void }[] = [];
+  listens: {
+    type: "channel";
+    id: string;
+    onMessage: (info: ChannelMessageEvent) => void;
+  }[] = [];
 
   constructor(public token: string, onError: (e: Error) => void) {
-    this.ws = new Promise(resolve => {
+    this.ws = new Promise((resolve) => {
       try {
         const ws = new WebSocket(`wss://misskey.io/streaming?i=${token}`);
         ws.onopen = () => {
@@ -40,10 +44,10 @@ export class MisskeyAPI {
               const json = JSON.parse(m.data);
 
               const channelMessage = channelMessageSchema.safeParse(json);
-              if(channelMessage.success) {
-                this.listens.find(v => v.id === channelMessage.data.body.id)?.onMessage(channelMessage.data);
+              if (channelMessage.success) {
+                this.listens.find((v) => v.id === channelMessage.data.body.id)
+                  ?.onMessage(channelMessage.data);
               }
-
             } catch {
               //TODO: WS Error Parse JSON
             }
@@ -53,55 +57,63 @@ export class MisskeyAPI {
           //TODO: handle correctly;
           Deno.exit(1);
         };
-      } catch(e) {
+      } catch (e) {
         onError(e);
       }
     });
   }
 
-  private async request(endpoint: `/${string}`, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async request(
+    endpoint: `/${string}`,
+    payload: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const req = await fetch(
-      `https://misskey.io/api${endpoint}`, {
-        method: 'POST',
+      `https://misskey.io/api${endpoint}`,
+      {
+        method: "POST",
         body: JSON.stringify({ i: this.token, ...payload }),
         headers: {
-          ['Content-Type']: 'application/json',
-        }
-      }
+          ["Content-Type"]: "application/json",
+        },
+      },
     );
     return req.json();
   }
 
-  async getMe(): Promise<{ success: true } & z.infer<typeof userSchema> | { success: false }> {
-    const api = await this.request('/i', {});
+  async getMe(): Promise<
+    { success: true } & z.infer<typeof userSchema> | { success: false }
+  > {
+    const api = await this.request("/i", {});
 
     const ok = userSchema.safeParse(api);
-    if(ok.success) {
+    if (ok.success) {
       return { success: true, ...ok.data };
     }
 
     return { success: false };
-  
   }
 
-  async startListenChannel(channel: string, id: string, onMessage: (ev: ChannelMessageEvent) => void) {
-    this.listens.push({ type: 'channel', id, onMessage });
+  async startListenChannel(
+    channel: string,
+    id: string,
+    onMessage: (ev: ChannelMessageEvent) => void,
+  ) {
+    this.listens.push({ type: "channel", id, onMessage });
     (await this.ws).send(JSON.stringify({
-      type: 'connect',
+      type: "connect",
       body: {
         channel,
         id,
-      }
+      },
     }));
   }
 
   async stopListenChannel(id: string) {
     (await this.ws).send(JSON.stringify({
-      type: 'disconnect',
+      type: "disconnect",
       body: {
         id,
-      }
+      },
     }));
   }
-
 }
