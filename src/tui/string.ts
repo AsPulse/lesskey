@@ -23,10 +23,13 @@ export function uiString<T extends boolean>(data: {
       const bytes = is2Byte(s) ? 2 : 1;
       const content = `${before}${s}\x1b[0m`;
       if(cache.length + bytes > width) {
+        while (cache.length <= width) {
+          cache.push(' ');
+        }
         result.push(cache);
         cache = [];
       }
-      cache.push(...[content, ...[...Array(bytes - 1)].fill('')]);
+      cache.push(...(bytes === 2 ? [content, ''] : [content]));
     });
   });
 

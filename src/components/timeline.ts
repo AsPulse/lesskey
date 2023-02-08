@@ -82,27 +82,35 @@ export class Timeline implements TUIComponent {
     const left = uiString([{ text: ` <[h] ${this.status.left}`, backgroundColor, foregroundColor }], area.w, true);
     const right = uiString([{ text: `${this.status.right} [l]> `, backgroundColor, foregroundColor }], area.w, true);
 
+    const texts = [];
+    
+    const width = area.w - area.x;
+    const height = area.h - area.y;
+
+    for (const note of this.notes) {
+    
+      texts.push(uiString([
+        { text: `@${note.body.body.user.name}`, foregroundColor: [100, 100, 100] },
+      ], width, true));
+
+      texts.push(
+        ...note.body.body.text.split(/\n/g).flatMap(text => 
+          uiString([{ text },], width, false)
+        )
+      );
+
+      texts.push([]);
+
+      if(texts.length > height) break;
+    }
+
     return Promise.resolve([
-      ...this.notes.flatMap((v, i) => ([
-        {
-          x: area.x,
-          y: area.y + 2 + i * 3,
-          z: 1,
-          content: [uiString([{ text: `@${v.body.body.user.username}`, foregroundColor: [100, 100, 100] }], area.w, true)]
-        },
-        {
-          x: area.x,
-          y: area.y + 2 + i * 3 + 1,
-          z: 1,
-          content: [uiString([{ text: v.body.body.text.replace(/\n/g, '[\\n]') }], area.w, true)]
-        },
-        {
-          x: area.x,
-          y: area.y + 2 + i * 3 + 2,
-          z: 1,
-          content: [uiString([{ text: '' }], area.w, true)]
-        }
-      ])),
+      {
+        x: area.x,
+        y: area.y + 2,
+        z: 1,
+        content: texts,
+      },
       {
         x: area.x,
         y: area.y,
