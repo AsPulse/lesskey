@@ -27,7 +27,6 @@ const channelMessageSchema = z.object({
   }),
 });
 
-
 export type ChannelMessageEvent = z.infer<typeof channelMessageSchema>;
 export type NewNoteEvent = z.infer<typeof messageSchema>;
 
@@ -99,12 +98,14 @@ export class MisskeyAPI {
     return { success: false };
   }
 
-  async fetchTimeline(type: string, limit: number): Promise<z.infer<typeof fetchTimelineSchema>> {
+  async fetchTimeline(
+    type: string,
+    limit: number,
+  ): Promise<z.infer<typeof fetchTimelineSchema>> {
     const api = await this.request(`/notes/${type}`, { limit });
     const data = fetchTimelineSchema.parse(api);
     return data;
   }
-
 
   async startListenChannel(
     channel: string,

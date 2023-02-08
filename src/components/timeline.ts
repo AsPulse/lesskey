@@ -1,4 +1,4 @@
-import { NewNoteEvent, MisskeyAPI } from "../api.ts";
+import { MisskeyAPI, NewNoteEvent } from "../api.ts";
 import { TUIArea, TUIComponent, TUIParent, TUIResult } from "../tui/index.ts";
 import { keyboard } from "../tui/keyboard.ts";
 import { uiString } from "../tui/string.ts";
@@ -22,7 +22,7 @@ export type MisskeyNote = {
 };
 
 const Note = (note: MisskeyNote, width: number) => {
-  const content = (note.message.text ?? '').split(/\n/).flatMap((text) =>
+  const content = (note.message.text ?? "").split(/\n/).flatMap((text) =>
     uiString([{ text }], width, false)
   );
 
@@ -103,14 +103,12 @@ export class Timeline implements TUIComponent {
       : timelines[index + 1].view;
 
     this.status = { left, right, now: timelines[index].view };
-    this.notes = 
-      (await this.api.fetchTimeline(timelines[index].apiId, 10))
-        .toReversed()
-        .map(v => ({ message: v, selected: false, opacity: 1 }));
+    this.notes = (await this.api.fetchTimeline(timelines[index].apiId, 10))
+      .toReversed()
+      .map((v) => ({ message: v, selected: false, opacity: 1 }));
     this.id = `--lesskey-TL-${Date.now()}`;
 
     await this.parent.render();
-
 
     this.api.startListenChannel(
       timelines[index].id,
