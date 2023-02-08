@@ -1,11 +1,11 @@
-import { Message } from "./components/message.ts";
-import { StatusBar } from "./components/statusbar.ts";
-import { TUICanvas } from "./tui/index.ts";
-import { keyboard } from "./tui/keyboard.ts";
-import { parse } from "https://deno.land/std@0.66.0/flags/mod.ts";
-import { sleep } from "./util/sleep.ts";
-import { MisskeyAPI } from "./api.ts";
-import { Timeline } from "./components/timeline.ts";
+import { Message } from './components/message.ts';
+import { StatusBar } from './components/statusbar.ts';
+import { TUICanvas } from './tui/index.ts';
+import { keyboard } from './tui/keyboard.ts';
+import { parse } from 'https://deno.land/std@0.66.0/flags/mod.ts';
+import { sleep } from './util/sleep.ts';
+import { MisskeyAPI } from './api.ts';
+import { Timeline } from './components/timeline.ts';
 
 const canvas = new TUICanvas();
 
@@ -23,28 +23,23 @@ await canvas.render();
 const parsedArgs = parse(Deno.args);
 
 main: {
-  if (!("token" in parsedArgs)) {
-    await connectStatus.setText([
-      "API Token was not provided!",
-      "Usage: lesskey --token <YOUR_TOKEN_HERE>",
-    ]);
+  if(!('token' in parsedArgs)) {
+    await connectStatus.setText(['API Token was not provided!', 'Usage: lesskey --token <YOUR_TOKEN_HERE>']); 
     break main;
   }
 
-  await connectStatus.setText(["Connecting to misskey.io!", "Please wait..."]);
+  await connectStatus.setText(['Connecting to misskey.io!', 'Please wait...']);
   await sleep(300);
   const api = new MisskeyAPI(parsedArgs.token, () => {
-    connectStatus.setText(["Error: The token is wrong."]);
+    connectStatus.setText(['Error: The token is wrong.']);
   });
 
   await api.ws;
 
   const me = await api.getMe();
 
-  if (!me.success) {
-    await connectStatus.setText([
-      "An unknown error occurred during the connection.",
-    ]);
+  if(!me.success) {
+    await connectStatus.setText(['An unknown error occurred during the connection.']);
     break main;
   }
 
@@ -57,8 +52,10 @@ main: {
 
   canvas.components = [
     statusBar,
-    timeline,
+    timeline
   ];
 
   await canvas.render();
+    
 }
+
