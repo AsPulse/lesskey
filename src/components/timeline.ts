@@ -92,7 +92,7 @@ export class Timeline implements TUIComponent {
     const texts = [];
     
     const width = area.w - area.x;
-    const height = area.h - area.y;
+    const height = area.h - area.y - 2;
 
     for (const note of this.notes) {
    
@@ -113,10 +113,12 @@ export class Timeline implements TUIComponent {
       if(texts.length > height) break;
     }
 
+    texts.splice(height);
+
     return Promise.resolve([
       {
         x: area.x,
-        y: area.y + 2,
+        y: area.y + 1,
         z: 1,
         content: texts,
       },
