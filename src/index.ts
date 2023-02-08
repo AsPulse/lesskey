@@ -48,53 +48,14 @@ main: {
 
   await statusBar.setId(me.username);
 
-  // TIMELINE
-  const timelines = [
-    { view: 'Home', id: 'homeTimeline' },
-    { view: 'Local', id: 'localTimeline' },
-    { view: 'Social', id: 'hybridTimeline' },
-    { view: 'Global', id: 'globalTimeline' },
-  ] as const;
+  const timeline = new Timeline(canvas, api);
 
-  let activeTimeline = 1;
-  let id: null | string = null;
-
-  const timeline = new Timeline(canvas);
   canvas.components = [
     statusBar,
     timeline
   ];
 
-  const setTimeline = async (index: number) => {
-    if(id !== null) {
-      await api.stopListenChannel(id);
-    }
-    console.log(index);
-    const left = index === 0 ? null : timelines[index - 1].view;
-    const right = index === timelines.length - 1 ? null : timelines[index + 1].view;
-    timeline.resetTimeline({
-      left, right, now: timelines[index].view,
-    });
-
-    id = `--lesskey-TL-${Date.now()}`;
-    api.startListenChannel(timelines[index].id, id, e => {
-      timeline.addNote(e);
-    });
-  };
-
-  setTimeline(activeTimeline);
-  keyboard.onPress(buf => {
-    // Key H
-    if(buf[0] === 104 && buf[1] === 0) {
-      if(activeTimeline > 0) setTimeline(--activeTimeline);
-      return;
-    }
-
-    if(buf[0] === 108 && buf[1] === 0) {
-      if(activeTimeline < timelines.length - 1) setTimeline(++activeTimeline);
-      return;
-    }
-  });
-
+  await canvas.render();
+    
 }
 
