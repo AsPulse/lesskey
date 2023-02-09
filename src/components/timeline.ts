@@ -171,7 +171,7 @@ export class Timeline implements TUIComponent {
       : timelines[index + 1].view;
 
     this.status = { left, right, now: timelines[index].view };
-    this.notes = (await this.api.fetchTimeline(timelines[index].apiId, 10))
+    this.notes = (await this.api.fetchTimeline(timelines[index].apiId, 20))
       .map((v) => ({ message: v, selected: false, opacity: 1 }));
     this.id = `--lesskey-TL-${Date.now()}`;
 
