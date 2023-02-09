@@ -21,10 +21,18 @@ export type MisskeyNote = {
   opacity: number;
 };
 
+const getRenderText = (message: NewNoteEvent) => {
+  if (message.text) return message.text;
+  if (message.renote) {
+    const renote = message.renote;
+    return `ReNote From: ${renote.user.name} @${renote.user.username}\n${renote.text}`;
+  }
+  return '';
+};
+
 const Note = (note: MisskeyNote, width: number) => {
-  const content = (note.message.text ?? '').split(/\n/).flatMap((text) =>
-    uiString([{ text }], width, false)
-  );
+  const content = getRenderText(note.message).split(/\n/)
+    .flatMap((text) => uiString([{ text }], width, false));
 
   const time = uiString(
     [
