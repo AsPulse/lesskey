@@ -33,10 +33,15 @@ const Note = (note: MisskeyNote, width: number) => {
         y: 0,
         content: [
           uiString(
-            [{
-              text: `@${note.message.user.username}`,
-              foregroundColor: [130, 130, 130],
-            }],
+            [
+              {
+                text: `${note.message.user.name ?? note.message.user.username} `,
+                foregroundColor: [120, 206, 235],
+              }, {
+                text: `@${note.message.user.username}`,
+                foregroundColor: [130, 130, 130],
+              }
+            ],
             width,
             true,
           ),
