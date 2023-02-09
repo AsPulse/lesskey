@@ -35,10 +35,12 @@ main: {
     break main;
   }
 
-  await connectStatus.setText(['Connecting to misskey.io!', 'Please wait...']);
+  const origin = 'origin' in parsedArgs ? parsedArgs.origin : 'misskey.io'
+
+  await connectStatus.setText([`Connecting to ${origin}`, 'Please wait...']);
   await sleep(300);
-  const api = new MisskeyAPI(parsedArgs.token, () => {
-    connectStatus.setText(['Error: The token is wrong.']);
+  const api = new MisskeyAPI(origin, parsedArgs.token, () => {
+    connectStatus.setText(['Error: The token or origin is wrong.']);
   });
 
   await api.ws;
@@ -52,10 +54,10 @@ main: {
     break main;
   }
 
-  await connectStatus.setText([`Logged in as "${me.name}"!`]);
+  await connectStatus.setText([`Logged in as "${me.name}(@${me.username})"!`]);
   await sleep(1250);
   
-  await statusBar.setId(me.username);
+  await statusBar.setId(`${me.username}@${origin}`);
   openTimeline(api);
 }
 

@@ -28,7 +28,7 @@ export class StatusBar implements TUIComponent {
       [{
         text: this.id === null
           ? ' LessKey '
-          : ` LessKey [@${this.id}@misskey.io] `,
+          : ` LessKey [@${this.id}] `,
         backgroundColor: [255, 56, 139],
         foregroundColor: [255, 255, 255],
         bold: true,

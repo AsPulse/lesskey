@@ -20,6 +20,12 @@ By default, vim will be launched, but can be specified as you like.
 lesskey --token <YOUR_API_TOKEN_HERE> --editor nvim
 ```
 
+By default, lesskey connects to Misskey.io, but if you want to connect to a different instance use the `--origin` flag.
+```
+lesskey --origin misskey.cf --token <YOUR_API_TOKEN_HERE>
+```
+
+
 <br>
 
 ## Getting Started
