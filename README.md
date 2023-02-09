@@ -11,6 +11,17 @@
 
 <br>
 
+### Prerequisites
+A text editor is required to post/edit notes.  
+By default, vim will be launched, but can be specified as you like.  
+
+(Example of Use Neovim)
+```
+lesskey --token <YOUR_API_TOKEN_HERE> --editor nvim
+```
+
+<br>
+
 ## Getting Started
 
 Usage (released binary):
