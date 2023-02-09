@@ -3,6 +3,10 @@ import { z } from 'zod';
 const userSchema = z.object({
   username: z.string(),
   name: z.string().nullable(),
+  host: z.string().nullable(),
+  emojis: z.record(z.string().url()).optional(),
+  isBot: z.boolean(),
+  isCat: z.boolean(),
 });
 
 const _errorSchema = z.object({
@@ -11,14 +15,47 @@ const _errorSchema = z.object({
   }),
 });
 
+const driveFileSchema = z.object({
+  createdAt: z.string(),
+  id: z.string(),
+  name: z.string(),
+  thumbnailUrl: z.string(),
+  url: z.string().url(),
+  type: z.string(),
+  size: z.number(),
+  blurhash: z.string(),
+  comment: z.string().nullable(),
+  properties: z.record(z.any()),
+});
+
 const messageBaseSchema = z.object({
   text: z.string().nullable(),
   user: userSchema,
   createdAt: z.string(),
+  renoteId: z.string().nullable(),
+  renoteCount: z.number(),
+  fileIds: z.array(z.string()),
+  files: z.array(driveFileSchema),
+  replayId: z.string().optional(),
+  repliesCount: z.number(),
+  reactions: z.record(z.string().min(1), z.number()),
+  reactionEmojis: z.record(z.string().url()),
+  emojis: z.record(z.string().url()).optional(),
+  tags: z.array(z.string()).optional(),
+  url: z.string().url().optional(),
+  uri: z.string().url().optional(),
+  visibility: z.union([
+    z.literal('public'),
+    z.literal('home'),
+    z.literal('followers'),
+    z.literal('specified'),
+  ]),
+  localOnly: z.boolean().optional(),
 });
 
 const messageSchema = messageBaseSchema.extend({
   renote: messageBaseSchema.optional(),
+  reply: messageBaseSchema.optional(),
 });
 
 const fetchTimelineSchema = messageSchema.array();
