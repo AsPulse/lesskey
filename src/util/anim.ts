@@ -1,4 +1,4 @@
-import { StatusBar } from "../components/statusbar.ts";
+import { StatusBar } from '../components/statusbar.ts';
 
 export type EasingFunction = (x: number) => number;
 
@@ -41,7 +41,10 @@ export const animation = async (
 export class Animation {
   change: [[number, number], [number, number]] | null = null;
 
-  constructor(public action: (y: number) => Promise<void>, public statusBar: StatusBar) {}
+  constructor(
+    public action: (y: number) => Promise<void>,
+    public statusBar: StatusBar,
+  ) {}
 
   async moveTo(
     change: [number, number],
@@ -50,7 +53,7 @@ export class Animation {
   ) {
     const isChanging = this.change !== null;
     this.change = [change, [Date.now(), Date.now() + ms]];
-    if(isChanging) return;
+    if (isChanging) return;
     this.action(this.change[0][0]);
 
     while (Date.now() <= this.change[1][1]) {

@@ -80,7 +80,7 @@ const Note = (note: MisskeyNote, width: number) => {
 export class Timeline implements TUIComponent {
   id: null | string = null;
   scrollOffset = 0;
-  scrollAnimation; 
+  scrollAnimation;
 
   lastWidth: null | number = null;
   status: StatusType = { now: 'Loading', left: null, right: null };
@@ -90,15 +90,19 @@ export class Timeline implements TUIComponent {
     return this.notes.findIndex((n) => n.selected);
   }
 
-  constructor(public parent: TUIParent, public api: MisskeyAPI, public statusBar: StatusBar) {
+  constructor(
+    public parent: TUIParent,
+    public api: MisskeyAPI,
+    public statusBar: StatusBar,
+  ) {
     this.setActiveTimeline(1);
 
     this.scrollAnimation = new Animation(async (y) => {
-    await sleep(5);
-    if (Math.round(y) === this.scrollOffset) return;
-    this.scrollOffset = Math.round(y);
-    await this.parent.render();
-  }, this.statusBar);
+      await sleep(5);
+      if (Math.round(y) === this.scrollOffset) return;
+      this.scrollOffset = Math.round(y);
+      await this.parent.render();
+    }, this.statusBar);
 
     keyboard.onPress((buf) => {
       // Key H
@@ -160,8 +164,14 @@ export class Timeline implements TUIComponent {
     if (this.lastWidth !== null) {
       const height = Note(note, this.lastWidth - 6).height + 3;
       this.scrollOffset += height;
-      const duration = Math.round(Math.max(300, 440*Math.log(this.scrollOffset) - 390));
-      this.scrollAnimation.moveTo([this.scrollOffset, 0], duration, easeOutExpo);
+      const duration = Math.round(
+        Math.max(300, 440 * Math.log(this.scrollOffset) - 390),
+      );
+      this.scrollAnimation.moveTo(
+        [this.scrollOffset, 0],
+        duration,
+        easeOutExpo,
+      );
     } else {
       this.scrollOffset = 0;
     }

@@ -11,7 +11,7 @@ export class StatusBar implements TUIComponent {
     this.id = id;
     await this.parent.render();
   }
-  
+
   async setText(content: string) {
     this.text = content;
     await this.parent.render();
@@ -24,19 +24,18 @@ export class StatusBar implements TUIComponent {
       true,
     );
 
-    const username = 
-      uiString(
-        [{
-          text: this.id === null
-            ? ' LessKey '
-            : ` LessKey [@${this.id}@misskey.io] `,
-          backgroundColor: [255, 56, 139],
-          foregroundColor: [255, 255, 255],
-          bold: true,
-        }],
-        area.w,
-        true,
-      );
+    const username = uiString(
+      [{
+        text: this.id === null
+          ? ' LessKey '
+          : ` LessKey [@${this.id}@misskey.io] `,
+        backgroundColor: [255, 56, 139],
+        foregroundColor: [255, 255, 255],
+        bold: true,
+      }],
+      area.w,
+      true,
+    );
 
     return Promise.resolve([
       {
@@ -55,14 +54,14 @@ export class StatusBar implements TUIComponent {
         x: area.x + username.length + 1,
         y: area.h - area.y - 1,
         z: 11,
-        content: [uiString([{ text: this.text }], area.w, true)]
+        content: [uiString([{ text: this.text }], area.w, true)],
       },
       {
         x: area.x,
         y: area.h - area.y - 1,
         z: 10,
         content: [uiString([{ text: ' '.repeat(area.w) }], area.w, true)],
-      }
+      },
     ]);
   }
 }
