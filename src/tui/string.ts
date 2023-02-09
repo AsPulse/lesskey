@@ -28,7 +28,7 @@ export function uiString<T extends boolean>(
       v.bold === true ? '\x1b[1m' : '',
     ].join('');
 
-    v.text.split('').forEach((s) => {
+    [...v.text].forEach((s) => {
       const bytes = is2Byte(s) ? 2 : 1;
       const content = `${before}${s}\x1b[0m`;
       if (cache.length + bytes > width) {
