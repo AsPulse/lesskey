@@ -6,6 +6,7 @@ import { parse } from 'std/flags/mod.ts';
 import { sleep } from './util/sleep.ts';
 import { MisskeyAPI } from './api.ts';
 import { Timeline } from './components/timeline.ts';
+import { NoteEditor } from './noteEditor.ts';
 
 const canvas = new TUICanvas();
 
@@ -21,6 +22,8 @@ keyboard.begin();
 await canvas.render();
 
 const parsedArgs = parse(Deno.args);
+
+let focusOn: 'timeline' | 'newpost' = 'timeline';
 
 main: {
   if (!('token' in parsedArgs)) {
@@ -50,9 +53,15 @@ main: {
 
   await connectStatus.setText([`Logged in as "${me.name}"!`]);
   await sleep(1250);
-
+  
   await statusBar.setId(me.username);
+  openTimeline(api);
+}
 
+async function openTimeline(api: MisskeyAPI) {
+  keyboard.begin();
+  focusOn = 'timeline';
+  await statusBar.setText('N…New Note')
   const timeline = new Timeline(canvas, api, statusBar);
 
   canvas.components = [
@@ -60,5 +69,27 @@ main: {
     timeline,
   ];
 
+  canvas.pauseRender = false;
   await canvas.render();
+
+  keyboard.onPress(buf => {
+    // N
+    if(buf[0] === 78 && buf[1] === 0) {
+      postNewNote(api);
+      keyboard.pauseFlag = true;
+    }
+  });
+}
+
+async function postNewNote(api: MisskeyAPI) {
+  if(focusOn === 'newpost') return;
+  focusOn = 'newpost';
+
+  await statusBar.setText('Opening TextEditor...');
+  canvas.pauseRender = true;
+  await sleep(300);
+
+  const note = await NoteEditor();
+
+  openTimeline(api);
 }

@@ -32,6 +32,7 @@ const channelMessageSchema = z.object({
   }),
 });
 
+export type User = z.infer<typeof userSchema>;
 export type ChannelMessageEvent = z.infer<typeof channelMessageSchema>;
 export type NewNoteEvent = z.infer<typeof messageSchema>;
 
