@@ -12,8 +12,8 @@
 <br>
 
 ### Prerequisites
-A CLI text editor is required to post/edit notes.  
-By default, vim will be launched, but can be specified separately.  
+A text editor is required to post/edit notes.  
+By default, vim will be launched, but can be specified as you like.  
 
 (Example of Use Neovim)
 ```
