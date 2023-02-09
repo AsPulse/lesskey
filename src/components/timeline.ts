@@ -1,7 +1,7 @@
 import { MisskeyAPI, NewNoteEvent } from "../api.ts";
 import { TUIArea, TUIComponent, TUIParent, TUIResult } from "../tui/index.ts";
 import { keyboard } from "../tui/keyboard.ts";
-import { uiString } from "../tui/string.ts";
+import { formatTimespan, uiString } from "../tui/string.ts";
 import { Animation, easeOutExpo } from "../util/anim.ts";
 import { sleep } from "../util/sleep.ts";
 
@@ -26,6 +26,10 @@ const Note = (note: MisskeyNote, width: number) => {
     uiString([{ text }], width, false)
   );
 
+  const time = uiString([
+    { text: formatTimespan(new Date(note.message.createdAt)), foregroundColor: [150, 150, 150] }
+  ], 12, true);
+
   return {
     components: [
       {
@@ -46,6 +50,11 @@ const Note = (note: MisskeyNote, width: number) => {
             true,
           ),
         ],
+      },
+      {
+        x: width - time.length,
+        y: 0,
+        content: [time],
       },
       {
         x: 0,
