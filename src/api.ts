@@ -19,7 +19,7 @@ const driveFileSchema = z.object({
   createdAt: z.string(),
   id: z.string(),
   name: z.string(),
-  thumbnailUrl: z.string(),
+  thumbnailUrl: z.string().nullable(),
   url: z.string(),
   type: z.string(),
   size: z.number(),
