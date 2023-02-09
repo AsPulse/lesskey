@@ -4,6 +4,7 @@ import { keyboard } from '../tui/keyboard.ts';
 import { formatTimespan, uiString } from '../tui/string.ts';
 import { Animation, easeOutExpo } from '../util/anim.ts';
 import { sleep } from '../util/sleep.ts';
+import { StatusBar } from './statusbar.ts';
 
 type StatusType = { now: string; left: string | null; right: string | null };
 
@@ -79,12 +80,7 @@ const Note = (note: MisskeyNote, width: number) => {
 export class Timeline implements TUIComponent {
   id: null | string = null;
   scrollOffset = 0;
-  scrollAnimation = new Animation(async (y) => {
-    await sleep(10);
-    if (Math.round(y) === this.scrollOffset) return;
-    this.scrollOffset = Math.round(y);
-    await this.parent.render();
-  });
+  scrollAnimation; 
 
   lastWidth: null | number = null;
   status: StatusType = { now: 'Loading', left: null, right: null };
@@ -94,8 +90,16 @@ export class Timeline implements TUIComponent {
     return this.notes.findIndex((n) => n.selected);
   }
 
-  constructor(public parent: TUIParent, public api: MisskeyAPI) {
+  constructor(public parent: TUIParent, public api: MisskeyAPI, public statusBar: StatusBar) {
     this.setActiveTimeline(1);
+
+    this.scrollAnimation = new Animation(async (y) => {
+    await sleep(5);
+    if (Math.round(y) === this.scrollOffset) return;
+    this.scrollOffset = Math.round(y);
+    await this.parent.render();
+  }, this.statusBar);
+
     keyboard.onPress((buf) => {
       // Key H
       if (buf[0] === 104 && buf[1] === 0) {
@@ -156,7 +160,8 @@ export class Timeline implements TUIComponent {
     if (this.lastWidth !== null) {
       const height = Note(note, this.lastWidth - 6).height + 3;
       this.scrollOffset += height;
-      this.scrollAnimation.moveTo([this.scrollOffset, 0], 500, easeOutExpo);
+      const duration = Math.round(Math.max(300, 440*Math.log(this.scrollOffset) - 390));
+      this.scrollAnimation.moveTo([this.scrollOffset, 0], duration, easeOutExpo);
     } else {
       this.scrollOffset = 0;
     }
