@@ -14,6 +14,7 @@ const _errorSchema = z.object({
 const messageSchema = z.object({
   text: z.string().nullable(),
   user: userSchema,
+  createdAt: z.string(),
 });
 
 const fetchTimelineSchema = messageSchema.array();

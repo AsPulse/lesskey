@@ -1,5 +1,5 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { is2Byte } from "./string.ts";
+import { formatTimespan, is2Byte } from "./string.ts";
 
 Deno.test("is2Byte() given numbers", () => {
   const actual = is2Byte("2");
@@ -38,4 +38,18 @@ Deno.test("is2Byte() given some ruled lines and so on", () => {
     const expected = false;
     assertEquals(actual, expected);
   }
+});
+
+Deno.test("formatTimeSpan() given future time", () => {
+  assertEquals(formatTimespan(new Date('2023-02-09T01:01:30.167Z'), new Date(1675904481000)), "Future");
+});
+
+Deno.test("formatTimeSpan() given just-now time", () => {
+  assertEquals(formatTimespan(new Date('2023-02-09T01:02:30.400Z'), new Date(1675904554000)), "Just now");
+  assertEquals(formatTimespan(new Date('2023-02-09T01:05:04.571Z'), new Date(1675904713000)), "Just now");
+});
+
+Deno.test("formatTimeSpan() given seconds-order time", () => {
+  assertEquals(formatTimespan(new Date('2023-02-09T01:08:25.456Z'), new Date(1675904917000)), "12s ago");
+
 });
