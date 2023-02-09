@@ -60,10 +60,10 @@ main: {
     break main;
   }
 
-  await connectStatus.setText([`Logged in as "${me.name}"!`]);
+  await connectStatus.setText([`Logged in as "${me.name}(@${me.username})"!`]);
   await sleep(1250);
   
-  await statusBar.setId(me.username);
+  await statusBar.setId(`${me.username}@${parsedArgs.origin}`);
   openTimeline(api);
 }
 
