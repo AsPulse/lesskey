@@ -1,4 +1,4 @@
-import { EventEmitter } from "https://deno.land/std@0.161.0/node/events.ts";
+import { EventEmitter } from "std/node/events.ts";
 
 export class TUIKeyboardListener {
   constructor() {}

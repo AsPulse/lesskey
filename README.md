@@ -25,5 +25,5 @@ lesskey --token <YOUR_API_TOKEN_HERE>
 Usage (from source code):
 
 ```
-deno run -A --unstable ./src/index.ts --token <YOUR_API_TOKEN_HERE>
+deno task dev --token <YOUR_API_TOKEN_HERE>
 ```

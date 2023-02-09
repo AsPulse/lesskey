@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --unstable --watch src/index.ts",
+    "main": "deno run --allow-net --unstable src/index.ts"
+  },
+  "imports": {
+    "std/": "https://deno.land/std@0.177.0/",
+    "zod": "https://deno.land/x/zod@v3.20.5/mod.ts"
+  }
+}

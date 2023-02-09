@@ -1,0 +1,21 @@
+{
+  "deno.enable": true,
+  "deno.unstable": true,
+  "deno.config": "./deno.jsonc",
+  "editor.formatOnSave": true,
+  "json.schemas": [{
+    "fileMatch": ["./deno.jsonc"],
+    "url": "https://deno.land/x/deno/cli/schemas/config-file.v1.json"
+  }],
+  "deno.inlayHints.enumMemberValues.enabled": false,
+  "deno.inlayHints.functionLikeReturnTypes.enabled": false,
+  "deno.inlayHints.parameterNames.suppressWhenArgumentMatchesName": false,
+  "deno.inlayHints.parameterTypes.enabled": false,
+  "deno.inlayHints.propertyDeclarationTypes.enabled": false,
+  "deno.inlayHints.parameterNames.enabled": "all",
+  "deno.inlayHints.variableTypes.enabled": false,
+  "deno.inlayHints.variableTypes.suppressWhenTypeMatchesName": false,
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  }
+}
