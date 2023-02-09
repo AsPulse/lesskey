@@ -53,7 +53,7 @@ main: {
 
   await statusBar.setId(me.username);
 
-  const timeline = new Timeline(canvas, api);
+  const timeline = new Timeline(canvas, api, statusBar);
 
   canvas.components = [
     statusBar,

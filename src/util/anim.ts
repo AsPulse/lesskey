@@ -1,3 +1,5 @@
+import { StatusBar } from '../components/statusbar.ts';
+
 export type EasingFunction = (x: number) => number;
 
 export const interpolation = (
@@ -39,27 +41,19 @@ export const animation = async (
 export class Animation {
   change: [[number, number], [number, number]] | null = null;
 
-  constructor(public action: (y: number) => Promise<void>) {}
+  constructor(
+    public action: (y: number) => Promise<void>,
+    public statusBar: StatusBar,
+  ) {}
 
   async moveTo(
     change: [number, number],
     ms: number,
     easingFunction: EasingFunction,
   ) {
-    if (this.change !== null) {
-      this.change = [[
-        interpolation(
-          Date.now(),
-          this.change[1],
-          this.change[0],
-          easingFunction,
-        ),
-        change[1],
-      ], [Date.now(), Date.now() + ms]];
-      return;
-    }
+    const isChanging = this.change !== null;
     this.change = [change, [Date.now(), Date.now() + ms]];
-
+    if (isChanging) return;
     this.action(this.change[0][0]);
 
     while (Date.now() <= this.change[1][1]) {
