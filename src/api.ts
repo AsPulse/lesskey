@@ -23,7 +23,7 @@ const driveFileSchema = z.object({
   url: z.string(),
   type: z.string(),
   size: z.number(),
-  blurhash: z.string(),
+  blurhash: z.string().nullable(),
   comment: z.string().nullable(),
   properties: z.record(z.string(), z.unknown()),
 });
