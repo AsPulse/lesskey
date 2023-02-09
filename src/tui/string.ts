@@ -47,3 +47,14 @@ export function uiString<T extends boolean>(
   return (oneLine ? result[0] : result) as T extends true ? string[]
     : string[][];
 }
+
+export function formatTimespan(target: Date, now: Date = new Date()) {
+  const span = now.getTime() - target.getTime();
+  if(span < 0) return 'Future';
+  if(span <= 10 * 1000) return 'Just now';
+  if(span <= 60 * 1000) return `${Math.round(span / 1000)}s ago`;
+  if(span <= 60 * 60 * 1000) return `${Math.round(span / 1000 / 60)}m ago`;
+  if(span <= 24 * 60 * 60 *1000) return `${Math.round(span / 1000 / 60 / 60)}h ago`;
+
+  return `${Math.round(span / 1000 / 60 / 60 / 24)}d ago`;
+}
