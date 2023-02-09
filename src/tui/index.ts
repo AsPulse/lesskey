@@ -33,6 +33,8 @@ export class TUICanvas {
   rendering = false;
   needToReRender = false;
 
+  pauseRender = false;
+
   size: null | { columns: number; rows: number } = null;
 
   constructor() {
@@ -47,6 +49,8 @@ export class TUICanvas {
   }
 
   async render() {
+    if(this.pauseRender) return;
+
     if (this.rendering) {
       this.needToReRender = true;
       return;

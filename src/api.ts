@@ -32,6 +32,7 @@ const channelMessageSchema = z.object({
   }),
 });
 
+export type User = z.infer<typeof userSchema>;
 export type ChannelMessageEvent = z.infer<typeof channelMessageSchema>;
 export type NewNoteEvent = z.infer<typeof messageSchema>;
 
@@ -125,6 +126,15 @@ export class MisskeyAPI {
         id,
       },
     }));
+  }
+
+  async postNote(content: string)  {
+    return await this.request('/notes/create', {
+      visibility: 'public',
+      text: content,
+      localOnly: false,
+      poll: null,
+    });
   }
 
   async stopListenChannel(id: string) {
