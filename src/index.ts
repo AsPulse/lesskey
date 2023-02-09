@@ -39,7 +39,7 @@ main: {
 
   await connectStatus.setText([`Connecting to ${origin}`, 'Please wait...']);
   await sleep(300);
-  const api = new MisskeyAPI(parsedArgs.origin, parsedArgs.token, () => {
+  const api = new MisskeyAPI(origin, parsedArgs.token, () => {
     connectStatus.setText(['Error: The token or origin is wrong.']);
   });
 
