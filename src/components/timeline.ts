@@ -22,24 +22,32 @@ export type MisskeyNote = {
   opacity: number;
 };
 
-const getRenderText = (message: NewNoteEvent) => {
-  if (message.text) return message.text;
-  if (message.renote) {
-    const renote = message.renote;
-    return `ReNote From: ${renote.user.name} @${renote.user.username}\n${renote.text}`;
-  }
-  return '';
-};
 
 const Note = (note: MisskeyNote, width: number) => {
-  const content = getRenderText(note.message).split(/\n/)
-    .flatMap((text) => uiString([{ text }], width, false));
-
+ 
+  const isRenote = note.message.renote !== undefined;
+  const noteCap = isRenote ? 1 : 0;
+  const message = note.message.renote ?? note.message;
+  
+  const content = (message.text ?? '').split(/\n/).flatMap(text =>
+    uiString([{ text }], width, false)
+  ); 
   const time = uiString(
     [
       {
-        text: formatTimespan(new Date(note.message.createdAt)),
+        text: formatTimespan(new Date(message.createdAt)),
         foregroundColor: [150, 150, 150],
+      },
+    ],
+    12,
+    true,
+  );
+
+  const postedTime = uiString(
+    [
+      {
+        text: formatTimespan(new Date(note.message.createdAt)),
+        foregroundColor: [30, 120, 100],
       },
     ],
     12,
@@ -48,20 +56,36 @@ const Note = (note: MisskeyNote, width: number) => {
 
   return {
     components: [
+      ...(!isRenote ? [] : [
+        {
+          x: 0,
+          y: 0,
+          content: [
+            uiString(
+              [{ text: `♻️ Renoted by ${note.message.user.name ?? note.message.user.username}`, foregroundColor: [40, 150, 120], bold: true }]
+            , width, true)
+          ]
+        },
+        {
+          x: width - postedTime.length,
+          y: 0,
+          content: [postedTime],
+        },
+      ]),
       {
         x: 0,
-        y: 0,
+        y: 0 + noteCap,
         content: [
           uiString(
             [
               {
                 text: `${
-                  note.message.user.name ?? note.message.user.username
+                  message.user.name ?? message.user.username
                 } `,
                 foregroundColor: [120, 206, 235],
               },
               {
-                text: `@${note.message.user.username}`,
+                text: `@${message.user.username}`,
                 foregroundColor: [130, 130, 130],
               },
             ],
@@ -72,16 +96,16 @@ const Note = (note: MisskeyNote, width: number) => {
       },
       {
         x: width - time.length,
-        y: 0,
+        y: 0 + noteCap,
         content: [time],
       },
       {
         x: 0,
-        y: 1,
+        y: 1 + noteCap,
         content,
       },
     ],
-    height: content.length + 1,
+    height: content.length + 1 + noteCap,
   };
 };
 
