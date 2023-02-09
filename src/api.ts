@@ -128,6 +128,15 @@ export class MisskeyAPI {
     }));
   }
 
+  async postNote(content: string)  {
+    return await this.request('/notes/create', {
+      visibility: 'public',
+      text: content,
+      localOnly: false,
+      poll: null,
+    });
+  }
+
   async stopListenChannel(id: string) {
     (await this.ws).send(JSON.stringify({
       type: 'disconnect',

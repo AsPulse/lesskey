@@ -12,6 +12,7 @@ const canvas = new TUICanvas();
 
 const statusBar = new StatusBar(canvas);
 const connectStatus = new Message(canvas);
+let timeline: null | Timeline = null;
 
 canvas.components = [
   statusBar,
@@ -62,7 +63,7 @@ async function openTimeline(api: MisskeyAPI) {
   keyboard.begin();
   focusOn = 'timeline';
   await statusBar.setText('N…New Note')
-  const timeline = new Timeline(canvas, api, statusBar);
+  timeline ??= new Timeline(canvas, api, statusBar);
 
   canvas.components = [
     statusBar,
@@ -90,6 +91,11 @@ async function postNewNote(api: MisskeyAPI) {
   await sleep(300);
 
   const note = await NoteEditor();
+
+
+  if(!note.cancelled) {
+    await api.postNote(note.content);
+  }
 
   openTimeline(api);
 }
