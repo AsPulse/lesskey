@@ -1,5 +1,5 @@
 export const is2Byte = (str: string) =>
-  '┌┐├┤╭╮╰╯└┘│─…'.includes(str)
+  '┌┐├┤╭╮╰╯└┘│─…♻️'.includes(str)
     ? false // deno-lint-ignore no-control-regex
     : str.match(/^[^\x01-\x7E\xA1-\xDF]+$/) !== null;
 

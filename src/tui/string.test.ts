@@ -38,6 +38,11 @@ Deno.test('is2Byte() given some ruled lines and so on', () => {
     const expected = false;
     assertEquals(actual, expected);
   }
+  {
+    const actual = is2Byte('♻️');
+    const expected = false;
+    assertEquals(actual, expected);
+  }
 });
 
 Deno.test('formatTimeSpan() given future time', () => {
