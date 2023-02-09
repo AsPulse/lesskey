@@ -4,7 +4,7 @@ const userSchema = z.object({
   username: z.string(),
   name: z.string().nullable(),
   host: z.string().nullable(),
-  emojis: z.record(z.string().url()).optional(),
+  emojis: z.record(z.string()).optional(),
   isBot: z.boolean(),
   isCat: z.boolean(),
 });
@@ -20,12 +20,12 @@ const driveFileSchema = z.object({
   id: z.string(),
   name: z.string(),
   thumbnailUrl: z.string(),
-  url: z.string().url(),
+  url: z.string(),
   type: z.string(),
   size: z.number(),
   blurhash: z.string(),
   comment: z.string().nullable(),
-  properties: z.record(z.any()),
+  properties: z.record(z.string(), z.unknown()),
 });
 
 const messageBaseSchema = z.object({
@@ -38,12 +38,12 @@ const messageBaseSchema = z.object({
   files: z.array(driveFileSchema),
   replayId: z.string().optional(),
   repliesCount: z.number(),
-  reactions: z.record(z.string().min(1), z.number()),
-  reactionEmojis: z.record(z.string().url()),
-  emojis: z.record(z.string().url()).optional(),
+  reactions: z.record(z.string(), z.number()),
+  reactionEmojis: z.record(z.string()),
+  emojis: z.record(z.string()).optional(),
   tags: z.array(z.string()).optional(),
-  url: z.string().url().optional(),
-  uri: z.string().url().optional(),
+  url: z.string().optional(),
+  uri: z.string().optional(),
   visibility: z.union([
     z.literal('public'),
     z.literal('home'),
