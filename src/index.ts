@@ -35,10 +35,18 @@ main: {
     break main;
   }
 
-  await connectStatus.setText(['Connecting to misskey.io!', 'Please wait...']);
+  if(!('origin' in parsedArgs)) {
+    await connectStatus.setText([
+      'Origin was not specified.',
+      'Connecting to Misskey.io.'
+    ])
+    parsedArgs.origin = 'misskey.io'
+  }
+
+  await connectStatus.setText([`Connecting to ${parsedArgs.origin}`, 'Please wait...']);
   await sleep(300);
-  const api = new MisskeyAPI(parsedArgs.token, () => {
-    connectStatus.setText(['Error: The token is wrong.']);
+  const api = new MisskeyAPI(parsedArgs.origin, parsedArgs.token, () => {
+    connectStatus.setText(['Error: The token or origin is wrong.']);
   });
 
   await api.ws;
