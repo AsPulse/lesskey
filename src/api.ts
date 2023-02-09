@@ -11,10 +11,14 @@ const _errorSchema = z.object({
   }),
 });
 
-const messageSchema = z.object({
+const messageBaseSchema = z.object({
   text: z.string().nullable(),
   user: userSchema,
   createdAt: z.string(),
+});
+
+const messageSchema = messageBaseSchema.extend({
+  renote: messageBaseSchema.optional(),
 });
 
 const fetchTimelineSchema = messageSchema.array();
