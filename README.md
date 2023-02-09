@@ -11,6 +11,17 @@
 
 <br>
 
+### Prerequisites
+A CLI text editor is required to post/edit notes.  
+By default, vim will be launched, but can be specified separately.  
+
+(Example of Cusom Editor)
+```
+lesskey --token <YOUR_API_TOKEN_HERE> --editor emacs
+```
+
+<br>
+
 ## Getting Started
 
 Usage (released binary):
