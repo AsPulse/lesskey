@@ -15,9 +15,9 @@
 A CLI text editor is required to post/edit notes.  
 By default, vim will be launched, but can be specified separately.  
 
-(Example of Cusom Editor)
+(Example of Use Neovim)
 ```
-lesskey --token <YOUR_API_TOKEN_HERE> --editor emacs
+lesskey --token <YOUR_API_TOKEN_HERE> --editor nvim
 ```
 
 <br>

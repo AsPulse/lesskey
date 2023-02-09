@@ -90,7 +90,7 @@ async function postNewNote(api: MisskeyAPI) {
   canvas.pauseRender = true;
   await sleep(300);
 
-  const note = await NoteEditor();
+  const note = await NoteEditor('editor' in parsedArgs ? parsedArgs.editor : 'vim');
 
 
   if(!note.cancelled) {

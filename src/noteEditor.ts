@@ -8,7 +8,7 @@ export const newNoteDefault = `
 ;
 `;
 
-export async function NoteEditor(content = newNoteDefault): Promise<{ cancelled: false, content: string } | { cancelled: true }> {
+export async function NoteEditor(editor: string, content = newNoteDefault): Promise<{ cancelled: false, content: string } | { cancelled: true }> {
   const file = await Deno.makeTempFile({
     prefix: 'Lesskey_NoteEditor_',
     suffix: ''
@@ -17,7 +17,7 @@ export async function NoteEditor(content = newNoteDefault): Promise<{ cancelled:
   await Deno.writeTextFile(file, content);
 
   Deno.stdin.setRaw(false);
-  await new Deno.Command('nvim', { args: [file] }).spawn().status;
+  await new Deno.Command(editor, { args: [file] }).spawn().status;
   Deno.stdin.setRaw(true);
 
   const text = await Deno.readTextFile(file);
