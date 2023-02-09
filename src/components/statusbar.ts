@@ -1,5 +1,5 @@
-import { TUIArea, TUIComponent, TUIParent } from "../tui/index.ts";
-import { uiString } from "../tui/string.ts";
+import { TUIArea, TUIComponent, TUIParent } from '../tui/index.ts';
+import { uiString } from '../tui/string.ts';
 
 export class StatusBar implements TUIComponent {
   constructor(public parent: TUIParent) {}
@@ -13,7 +13,7 @@ export class StatusBar implements TUIComponent {
 
   render(area: TUIArea) {
     const howToQuit = uiString(
-      [{ text: "(Ctrl+C to quit)", foregroundColor: [100, 100, 100] }],
+      [{ text: '(Ctrl+C to quit)', foregroundColor: [100, 100, 100] }],
       area.w,
       true,
     );
@@ -27,7 +27,7 @@ export class StatusBar implements TUIComponent {
           uiString(
             [{
               text: this.id === null
-                ? " LessKey "
+                ? ' LessKey '
                 : ` LessKey [@${this.id}@misskey.io] `,
               backgroundColor: [255, 56, 139],
               foregroundColor: [255, 255, 255],

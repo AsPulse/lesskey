@@ -1,4 +1,4 @@
-import { EventEmitter } from "std/node/events.ts";
+import { EventEmitter } from 'std/node/events.ts';
 
 export class TUIKeyboardListener {
   constructor() {}
@@ -18,7 +18,7 @@ export class TUIKeyboardListener {
       //Ctrl-C to break
       if (this.buf && this.buf[0] === 0x03) break;
 
-      if (this.buf) this.events.emit("press", this.buf);
+      if (this.buf) this.events.emit('press', this.buf);
     }
 
     Deno.stdin.setRaw(false);
@@ -27,7 +27,7 @@ export class TUIKeyboardListener {
   }
 
   onPress(emitter: (buf: Uint8Array) => void) {
-    this.events.on("press", emitter);
+    this.events.on('press', emitter);
   }
 }
 

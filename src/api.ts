@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const userSchema = z.object({
   username: z.string(),
@@ -20,10 +20,10 @@ const messageSchema = z.object({
 const fetchTimelineSchema = messageSchema.array();
 
 const channelMessageSchema = z.object({
-  type: z.literal("channel"),
+  type: z.literal('channel'),
   body: z.object({
     id: z.string(),
-    type: z.literal("note"),
+    type: z.literal('note'),
     body: messageSchema,
   }),
 });
@@ -34,7 +34,7 @@ export type NewNoteEvent = z.infer<typeof messageSchema>;
 export class MisskeyAPI {
   ws: Promise<WebSocket>;
   listens: {
-    type: "channel";
+    type: 'channel';
     id: string;
     onMessage: (info: ChannelMessageEvent) => void;
   }[] = [];
@@ -76,10 +76,10 @@ export class MisskeyAPI {
     const req = await fetch(
       `https://misskey.io/api${endpoint}`,
       {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({ i: this.token, ...payload }),
         headers: {
-          ["Content-Type"]: "application/json",
+          ['Content-Type']: 'application/json',
         },
       },
     );
@@ -89,7 +89,7 @@ export class MisskeyAPI {
   async getMe(): Promise<
     { success: true } & z.infer<typeof userSchema> | { success: false }
   > {
-    const api = await this.request("/i", {});
+    const api = await this.request('/i', {});
 
     const ok = userSchema.safeParse(api);
     if (ok.success) {
@@ -113,9 +113,9 @@ export class MisskeyAPI {
     id: string,
     onMessage: (ev: ChannelMessageEvent) => void,
   ) {
-    this.listens.push({ type: "channel", id, onMessage });
+    this.listens.push({ type: 'channel', id, onMessage });
     (await this.ws).send(JSON.stringify({
-      type: "connect",
+      type: 'connect',
       body: {
         channel,
         id,
@@ -125,7 +125,7 @@ export class MisskeyAPI {
 
   async stopListenChannel(id: string) {
     (await this.ws).send(JSON.stringify({
-      type: "disconnect",
+      type: 'disconnect',
       body: {
         id,
       },
