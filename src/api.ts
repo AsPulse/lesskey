@@ -81,10 +81,10 @@ export class MisskeyAPI {
     onMessage: (info: ChannelMessageEvent) => void;
   }[] = [];
 
-  constructor(public token: string, onError: (e: Error) => void) {
+  constructor(public origin: string, public token: string, onError: (e: Error) => void) {
     this.ws = new Promise((resolve) => {
       try {
-        const ws = new WebSocket(`wss://misskey.io/streaming?i=${token}`);
+        const ws = new WebSocket(`wss://${origin}/streaming?i=${token}`);
         ws.onopen = () => {
           resolve(ws);
           ws.onmessage = (m: MessageEvent) => {
@@ -116,7 +116,7 @@ export class MisskeyAPI {
     payload: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     const req = await fetch(
-      `https://misskey.io/api${endpoint}`,
+      `https://${this.origin}/api${endpoint}`,
       {
         method: 'POST',
         body: JSON.stringify({ i: this.token, ...payload }),
