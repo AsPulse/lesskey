@@ -22,16 +22,14 @@ export type MisskeyNote = {
   opacity: number;
 };
 
-
 const Note = (note: MisskeyNote, width: number) => {
- 
   const isRenote = note.message.renote !== undefined;
   const noteCap = isRenote ? 1 : 0;
   const message = note.message.renote ?? note.message;
-  
-  const content = (message.text ?? '').split(/\n/).flatMap(text =>
+
+  const content = (message.text ?? '').split(/\n/).flatMap((text) =>
     uiString([{ text }], width, false)
-  ); 
+  );
   const time = uiString(
     [
       {
@@ -62,9 +60,17 @@ const Note = (note: MisskeyNote, width: number) => {
           y: 0,
           content: [
             uiString(
-              [{ text: `♻️ Renoted by ${note.message.user.name ?? note.message.user.username}`, foregroundColor: [40, 150, 120], bold: true }]
-            , width, true)
-          ]
+              [{
+                text: `♻️ Renoted by ${
+                  note.message.user.name ?? note.message.user.username
+                }`,
+                foregroundColor: [40, 150, 120],
+                bold: true,
+              }],
+              width,
+              true,
+            ),
+          ],
         },
         {
           x: width - postedTime.length,
@@ -79,9 +85,7 @@ const Note = (note: MisskeyNote, width: number) => {
           uiString(
             [
               {
-                text: `${
-                  message.user.name ?? message.user.username
-                } `,
+                text: `${message.user.name ?? message.user.username} `,
                 foregroundColor: [120, 206, 235],
               },
               {
