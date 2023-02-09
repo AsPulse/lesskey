@@ -1,4 +1,3 @@
-
 <p align="center">
   <picture>
     <img src="https://github.com/AsPulse/lesskey/blob/main/assets/icon-v1.png?raw=true" height="128">

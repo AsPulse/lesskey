@@ -1,17 +1,17 @@
-import { MisskeyAPI, NewNoteEvent } from "../api.ts";
-import { TUIArea, TUIComponent, TUIParent, TUIResult } from "../tui/index.ts";
-import { keyboard } from "../tui/keyboard.ts";
-import { formatTimespan, uiString } from "../tui/string.ts";
-import { Animation, easeOutExpo } from "../util/anim.ts";
-import { sleep } from "../util/sleep.ts";
+import { MisskeyAPI, NewNoteEvent } from '../api.ts';
+import { TUIArea, TUIComponent, TUIParent, TUIResult } from '../tui/index.ts';
+import { keyboard } from '../tui/keyboard.ts';
+import { formatTimespan, uiString } from '../tui/string.ts';
+import { Animation, easeOutExpo } from '../util/anim.ts';
+import { sleep } from '../util/sleep.ts';
 
 type StatusType = { now: string; left: string | null; right: string | null };
 
 const timelines = [
-  { view: "Home", id: "homeTimeline", apiId: "timeline" },
-  { view: "Local", id: "localTimeline", apiId: "local-timeline" },
-  { view: "Social", id: "hybridTimeline", apiId: "hybrid-timeline" },
-  { view: "Global", id: "globalTimeline", apiId: "global-timeline" },
+  { view: 'Home', id: 'homeTimeline', apiId: 'timeline' },
+  { view: 'Local', id: 'localTimeline', apiId: 'local-timeline' },
+  { view: 'Social', id: 'hybridTimeline', apiId: 'hybrid-timeline' },
+  { view: 'Global', id: 'globalTimeline', apiId: 'global-timeline' },
 ] as const;
 
 export type TimelineId = number & (keyof typeof timelines);
@@ -22,13 +22,20 @@ export type MisskeyNote = {
 };
 
 const Note = (note: MisskeyNote, width: number) => {
-  const content = (note.message.text ?? "").split(/\n/).flatMap((text) =>
+  const content = (note.message.text ?? '').split(/\n/).flatMap((text) =>
     uiString([{ text }], width, false)
   );
 
-  const time = uiString([
-    { text: formatTimespan(new Date(note.message.createdAt)), foregroundColor: [150, 150, 150] }
-  ], 12, true);
+  const time = uiString(
+    [
+      {
+        text: formatTimespan(new Date(note.message.createdAt)),
+        foregroundColor: [150, 150, 150],
+      },
+    ],
+    12,
+    true,
+  );
 
   return {
     components: [
@@ -39,12 +46,15 @@ const Note = (note: MisskeyNote, width: number) => {
           uiString(
             [
               {
-                text: `${note.message.user.name ?? note.message.user.username} `,
+                text: `${
+                  note.message.user.name ?? note.message.user.username
+                } `,
                 foregroundColor: [120, 206, 235],
-              }, {
+              },
+              {
                 text: `@${note.message.user.username}`,
                 foregroundColor: [130, 130, 130],
-              }
+              },
             ],
             width,
             true,
@@ -77,7 +87,7 @@ export class Timeline implements TUIComponent {
   });
 
   lastWidth: null | number = null;
-  status: StatusType = { now: "Loading", left: null, right: null };
+  status: StatusType = { now: 'Loading', left: null, right: null };
   notes: MisskeyNote[] = [];
 
   get selectedNotes() {
@@ -199,7 +209,7 @@ export class Timeline implements TUIComponent {
           content: [
             uiString(
               [{
-                text: `┌${"─".repeat(width - 2)}┐`,
+                text: `┌${'─'.repeat(width - 2)}┐`,
                 foregroundColor: [80, 80, 80],
               }],
               width,
@@ -215,7 +225,7 @@ export class Timeline implements TUIComponent {
           content: [
             uiString(
               [{
-                text: `├${"─".repeat(width - 2)}┤`,
+                text: `├${'─'.repeat(width - 2)}┤`,
                 foregroundColor: [80, 80, 80],
               }],
               width,
@@ -242,7 +252,7 @@ export class Timeline implements TUIComponent {
           y: area.y + stuck + i,
           z: 1,
           content: [
-            uiString([{ text: "│", foregroundColor: [80, 80, 80] }], 1, true),
+            uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true),
           ],
         });
 
@@ -251,7 +261,7 @@ export class Timeline implements TUIComponent {
           y: area.y + stuck + i,
           z: 1,
           content: [
-            uiString([{ text: "│", foregroundColor: [80, 80, 80] }], 1, true),
+            uiString([{ text: '│', foregroundColor: [80, 80, 80] }], 1, true),
           ],
         });
       }
@@ -267,7 +277,7 @@ export class Timeline implements TUIComponent {
           content: [
             uiString(
               [{
-                text: `└${"─".repeat(width - 2)}┘`,
+                text: `└${'─'.repeat(width - 2)}┘`,
                 foregroundColor: [80, 80, 80],
               }],
               width,
@@ -293,7 +303,7 @@ export class Timeline implements TUIComponent {
         z: 2,
         content: [
           uiString(
-            [{ text: " ".repeat(area.w), backgroundColor }],
+            [{ text: ' '.repeat(area.w), backgroundColor }],
             area.w,
             true,
           ),

@@ -1,5 +1,5 @@
-import { TUIArea, TUIComponent, TUIParent } from "../tui/index.ts";
-import { uiString } from "../tui/string.ts";
+import { TUIArea, TUIComponent, TUIParent } from '../tui/index.ts';
+import { uiString } from '../tui/string.ts';
 
 export class Message implements TUIComponent {
   constructor(public parent: TUIParent) {}

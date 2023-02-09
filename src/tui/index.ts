@@ -1,5 +1,5 @@
-import { writeAll } from "std/streams/write_all.ts";
-import { is2Byte } from "./string.ts";
+import { writeAll } from 'std/streams/write_all.ts';
+import { is2Byte } from './string.ts';
 export interface TUIPoint {
   x: number;
   y: number;
@@ -53,7 +53,7 @@ export class TUICanvas {
     }
 
     this.rendering = true;
-    let text = "";
+    let text = '';
 
     this.size = Deno.consoleSize();
     const { columns: width, rows: height } = this.size;
@@ -84,23 +84,23 @@ export class TUICanvas {
           });
 
         if (onComponents.length < 1) {
-          text += " ";
+          text += ' ';
         } else {
           const topComponent = onComponents.reduce((a, b) => a.z > b.z ? a : b);
           const content =
             topComponent.content[y - topComponent.y][x - topComponent.x];
           if (x === area.w - 1 && is2Byte(content)) {
-            text += " ";
+            text += ' ';
             continue;
           }
           text += content;
         }
       }
-      if (y + 1 < area.h) text += "\n"; //`\n\x1b[${y + 2};1H`;
+      if (y + 1 < area.h) text += '\n'; //`\n\x1b[${y + 2};1H`;
     }
 
     const encoded = this.encoder.encode(
-      "\x1b[1;1H" + text + `\x1b[${area.h}:${area.w}H\x1b[0K`,
+      '\x1b[1;1H' + text + `\x1b[${area.h}:${area.w}H\x1b[0K`,
     );
 
     await writeAll(Deno.stdout, encoded);
